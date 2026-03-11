@@ -1,51 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Minhas Finanças</title>
+<title>Finanças</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
 
-body{
-margin:0;
-font-family:Arial;
-background:#820ad1;
-color:white;
-transition:0.3s;
+:root{
+--bg:#f4f6fb;
+--card:#ffffff;
+--text:#1f2937;
+--primary:#3b82f6;
+--danger:#ef4444;
+--success:#10b981;
 }
 
-.light{
-background:#f3f4f6;
-color:black;
+.dark{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#e5e7eb;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:var(--bg);
+color:var(--text);
 }
 
 .container{
-max-width:420px;
+max-width:450px;
 margin:auto;
 padding:20px;
 }
 
 .card{
-background:white;
-color:black;
+background:var(--card);
 padding:18px;
 border-radius:14px;
-margin-top:15px;
-box-shadow:0 5px 20px rgba(0,0,0,0.2);
-}
-
-.dark .card{
-background:#1f2937;
-color:white;
+margin-top:14px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
 input,select,button{
@@ -53,18 +56,23 @@ width:100%;
 padding:12px;
 margin-top:8px;
 border-radius:8px;
-border:none;
-font-size:15px;
+border:1px solid #ddd;
+font-size:14px;
 }
 
 button{
-background:#820ad1;
+background:var(--primary);
 color:white;
+border:none;
 cursor:pointer;
 }
 
+.logout{
+background:#64748b;
+}
+
 .gasto{
-background:#ef4444;
+background:var(--danger);
 }
 
 .saldo{
@@ -72,8 +80,36 @@ font-size:32px;
 font-weight:bold;
 }
 
-.verde{color:#16a34a}
-.vermelho{color:#dc2626}
+.dashboard{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.box{
+background:var(--card);
+padding:15px;
+border-radius:10px;
+text-align:center;
+}
+
+.verde{color:var(--success)}
+.vermelho{color:var(--danger)}
+
+.hidden{
+display:none;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.theme{
+background:black;
+color:white;
+}
 
 ul{
 list-style:none;
@@ -84,23 +120,7 @@ li{
 display:flex;
 justify-content:space-between;
 margin-top:6px;
-}
-
-.login{
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-}
-
-.hidden{
-display:none;
-}
-
-.themeBtn{
-background:black;
-margin-top:10px;
+font-size:14px;
 }
 
 </style>
@@ -109,23 +129,47 @@ margin-top:10px;
 
 <body>
 
-<div id="loginTela" class="login">
+<div id="login" class="container">
 
-<h2>💜 Minhas Finanças</h2>
+<h2>Login</h2>
 
-<input id="nome" placeholder="Seu nome">
+<input id="email" placeholder="Email">
 <input id="senha" type="password" placeholder="Senha">
 
-<button onclick="entrar()">Entrar</button>
+<button onclick="login()">Entrar</button>
+<button onclick="registrar()">Criar Conta</button>
 
 </div>
 
 
 <div id="app" class="container hidden">
 
-<button class="themeBtn" onclick="trocarTema()">🌗 Alternar Tema</button>
+<div class="topbar">
 
-<h2 id="boasVindas"></h2>
+<h2>Dashboard</h2>
+
+<div>
+<button class="theme" onclick="tema()">🌙</button>
+<button class="logout" onclick="logout()">Sair</button>
+</div>
+
+</div>
+
+
+<div class="dashboard">
+
+<div class="box">
+Receitas
+<div id="totalReceita" class="verde">R$0</div>
+</div>
+
+<div class="box">
+Gastos
+<div id="totalGasto" class="vermelho">R$0</div>
+</div>
+
+</div>
+
 
 <div class="card">
 
@@ -140,7 +184,7 @@ Saldo
 
 <h3>Adicionar Receita</h3>
 
-<input type="number" id="receitaValor" placeholder="Valor">
+<input id="receitaValor" type="number" placeholder="Valor">
 
 <button onclick="addReceita()">Adicionar</button>
 
@@ -151,9 +195,9 @@ Saldo
 
 <h3>Adicionar Gasto</h3>
 
-<input type="number" id="gastoValor" placeholder="Valor">
+<input id="gastoValor" type="number" placeholder="Valor">
 
-<select id="categoria" onchange="mostrarOutro()">
+<select id="categoria" onchange="outroCampo()">
 
 <option>Comida</option>
 <option>Transporte</option>
@@ -163,18 +207,9 @@ Saldo
 
 </select>
 
-<input id="outroCampo" class="hidden" placeholder="Qual gasto?">
+<input id="outro" class="hidden" placeholder="Digite categoria">
 
 <button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
-
-</div>
-
-
-<div class="card">
-
-<h3>Histórico</h3>
-
-<ul id="lista"></ul>
 
 </div>
 
@@ -190,9 +225,9 @@ Saldo
 
 <div class="card">
 
-<button onclick="backupOnline()">Salvar Backup Online</button>
+<h3>Histórico</h3>
 
-<button onclick="restaurarBackup()">Restaurar Backup</button>
+<ul id="lista"></ul>
 
 </div>
 
@@ -201,12 +236,7 @@ Saldo
 
 <script>
 
-let dados = JSON.parse(localStorage.getItem("dados")) || []
-let grafico
-
-// Firebase configuração (substitua pelos seus dados)
-
-const firebaseConfig = {
+const firebaseConfig={
 apiKey:"SUA_API",
 authDomain:"SEUAPP.firebaseapp.com",
 projectId:"SEUAPP"
@@ -214,66 +244,106 @@ projectId:"SEUAPP"
 
 firebase.initializeApp(firebaseConfig)
 
-const db = firebase.firestore()
+const auth=firebase.auth()
+const db=firebase.firestore()
 
-function entrar(){
+let dados=[]
+let grafico
 
-let nome=document.getElementById("nome").value
-let senha=document.getElementById("senha").value
+function tema(){
 
-if(!nome || !senha){
-
-alert("Digite nome e senha")
-return
-
-}
-
-localStorage.setItem("usuario",nome)
-
-document.getElementById("loginTela").classList.add("hidden")
-document.getElementById("app").classList.remove("hidden")
-
-document.getElementById("boasVindas").innerText="Olá, "+nome
-
-atualizar()
-
-}
-
-if(localStorage.getItem("usuario")){
-
-document.getElementById("loginTela").classList.add("hidden")
-document.getElementById("app").classList.remove("hidden")
-
-document.getElementById("boasVindas").innerText="Olá, "+localStorage.getItem("usuario")
-
-}
-
-function trocarTema(){
-
-document.body.classList.toggle("light")
 document.body.classList.toggle("dark")
 
 }
 
-function dataHoje(){
+function outroCampo(){
 
-return new Date().toISOString().split("T")[0]
+let cat=document.getElementById("categoria").value
+
+if(cat==="Outros"){
+document.getElementById("outro").classList.remove("hidden")
+}else{
+document.getElementById("outro").classList.add("hidden")
+}
 
 }
 
-function mostrarOutro(){
+function registrar(){
 
-let categoria=document.getElementById("categoria").value
+let email=emailInput()
+let senha=senhaInput()
 
-if(categoria==="Outros"){
+auth.createUserWithEmailAndPassword(email,senha)
 
-document.getElementById("outroCampo").classList.remove("hidden")
+}
+
+function login(){
+
+let email=emailInput()
+let senha=senhaInput()
+
+auth.signInWithEmailAndPassword(email,senha)
+
+}
+
+function logout(){
+
+auth.signOut()
+
+}
+
+function emailInput(){
+return document.getElementById("email").value
+}
+
+function senhaInput(){
+return document.getElementById("senha").value
+}
+
+auth.onAuthStateChanged(user=>{
+
+if(user){
+
+document.getElementById("login").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
+
+sincronizar(user.uid)
 
 }else{
 
-document.getElementById("outroCampo").classList.add("hidden")
+document.getElementById("login").classList.remove("hidden")
+document.getElementById("app").classList.add("hidden")
 
 }
+
+})
+
+function sincronizar(uid){
+
+db.collection("financas").doc(uid)
+.onSnapshot(doc=>{
+
+if(doc.exists){
+
+dados=doc.data().dados
+
+}else{
+
+dados=[]
+
+}
+
+atualizar()
+
+})
+
+}
+
+function salvar(uid){
+
+db.collection("financas").doc(uid).set({
+dados:dados
+})
 
 }
 
@@ -281,17 +351,17 @@ function addReceita(){
 
 let valor=Number(document.getElementById("receitaValor").value)
 
-if(!valor)return
+let user=auth.currentUser
 
 dados.push({
 
 tipo:"receita",
 valor:valor,
-data:dataHoje()
+data:new Date().toLocaleDateString()
 
 })
 
-salvar()
+salvar(user.uid)
 
 }
 
@@ -299,86 +369,71 @@ function addGasto(){
 
 let valor=Number(document.getElementById("gastoValor").value)
 
-let categoria=document.getElementById("categoria").value
+let cat=document.getElementById("categoria").value
 
-if(categoria==="Outros"){
+if(cat==="Outros"){
 
-categoria=document.getElementById("outroCampo").value
+cat=document.getElementById("outro").value
 
 }
 
-if(!valor)return
+let user=auth.currentUser
 
 dados.push({
 
 tipo:"gasto",
 valor:valor,
-categoria:categoria,
-data:dataHoje()
+categoria:cat,
+data:new Date().toLocaleDateString()
 
 })
 
-salvar()
-
-}
-
-function salvar(){
-
-localStorage.setItem("dados",JSON.stringify(dados))
-
-atualizar()
+salvar(user.uid)
 
 }
 
 function atualizar(){
 
 let saldo=0
+let receita=0
+let gasto=0
+
+let categorias={}
 
 let lista=document.getElementById("lista")
 
 lista.innerHTML=""
 
-let categorias={}
+dados.forEach(d=>{
 
-dados.forEach(item=>{
-
-if(item.tipo==="receita"){
-
-saldo+=item.valor
-
+if(d.tipo==="receita"){
+saldo+=d.valor
+receita+=d.valor
 }else{
+saldo-=d.valor
+gasto+=d.valor
 
-saldo-=item.valor
-
-if(!categorias[item.categoria]){
-
-categorias[item.categoria]=0
-
-}
-
-categorias[item.categoria]+=item.valor
-
+if(!categorias[d.categoria])categorias[d.categoria]=0
+categorias[d.categoria]+=d.valor
 }
 
 let li=document.createElement("li")
 
-li.innerHTML=`${item.data} ${item.tipo} R$${item.valor}`
+li.innerHTML=`${d.data} ${d.tipo} R$${d.valor}`
 
 lista.appendChild(li)
 
 })
 
-let saldoElemento=document.getElementById("saldo")
-
-saldoElemento.innerText="R$"+saldo.toFixed(2)
-
-saldoElemento.className="saldo "+(saldo>=0?"verde":"vermelho")
+document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
+document.getElementById("totalReceita").innerText="R$"+receita
+document.getElementById("totalGasto").innerText="R$"+gasto
 
 desenharGrafico(categorias)
 
 }
 
-function desenharGrafico(categorias){
+function desenharGrafico(cat){
 
 let ctx=document.getElementById("grafico")
 
@@ -387,51 +442,14 @@ if(grafico)grafico.destroy()
 grafico=new Chart(ctx,{
 type:"doughnut",
 data:{
-labels:Object.keys(categorias),
-datasets:[{data:Object.values(categorias)}]
+labels:Object.keys(cat),
+datasets:[{data:Object.values(cat)}]
 }
 })
 
 }
-
-async function backupOnline(){
-
-let usuario=localStorage.getItem("usuario")
-
-await db.collection("financas").doc(usuario).set({
-
-dados:dados
-
-})
-
-alert("Backup salvo!")
-
-}
-
-async function restaurarBackup(){
-
-let usuario=localStorage.getItem("usuario")
-
-let doc=await db.collection("financas").doc(usuario).get()
-
-if(doc.exists){
-
-dados=doc.data().dados
-
-localStorage.setItem("dados",JSON.stringify(dados))
-
-atualizar()
-
-alert("Backup restaurado!")
-
-}
-
-}
-
-atualizar()
 
 </script>
 
 </body>
-
 </html>
