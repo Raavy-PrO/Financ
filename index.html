@@ -13,18 +13,11 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <style>
+/* --- ESTILOS --- */
 *{box-sizing:border-box;}
-body{
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin:0;
-  background:#f5f6fb;
-  color:#1f2937;
-  transition:0.3s;
-  min-height:100vh;
-}
+body{font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;margin:0;background:#f5f6fb;color:#1f2937;transition:0.3s;min-height:100vh;}
 .dark{background:#0f172a;color:#e2e8f0;}
 .hidden{display:none !important;}
-
 /* Login */
 .loginBox{height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
 .loginCard{background:white;padding:30px;border-radius:14px;width:100%;max-width:350px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;transition:0.3s;}
@@ -36,11 +29,8 @@ body{
 .loginCard button{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:none;cursor:pointer;background:#3b82f6;color:white;transition:0.3s;font-weight:600;}
 .loginCard button:hover{background:#2563eb;}
 .loginCard button:disabled{background:#9ca3af;cursor:not-allowed;}
-
 /* App */
 .container{max-width:420px;margin:auto;padding:20px;padding-bottom:80px;}
-
-/* Topbar */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;}
 .iconBtn{background:#3b82f6;color:white;border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:0.3s;}
 .iconBtn:hover{background:#2563eb;}
@@ -49,8 +39,6 @@ body{
 .fotoPerfil{width:40px;height:40px;border-radius:50%;object-fit:cover;}
 .infoPerfil{display:flex;align-items:center;gap:10px;}
 .email{font-size:14px;opacity:0.9;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* Dashboard Cards */
 .dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
 .box{background:white;padding:15px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.08);transition: transform 0.3s, box-shadow 0.3s;}
 .dark .box{background:#1e293b;}
@@ -58,8 +46,6 @@ body{
 .verde{color:#10b981;}
 .vermelho{color:#ef4444;}
 .saldo{font-size:28px;font-weight:bold;margin-top:5px;}
-
-/* Cards de ação */
 .card{background:white;padding:20px;border-radius:12px;margin-top:15px;transition:0.3s;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
 .dark .card{background:#1e293b;}
 .card h3{margin-top:0;margin-bottom:15px;font-size:16px;}
@@ -67,16 +53,12 @@ body{
 .dark .card input,.dark .card select{background:#0f172a;color:white;border:1px solid #444;}
 .card button{width:100%;margin-top:10px;padding:12px;border-radius:8px;border:none;cursor:pointer;background:#3b82f6;color:white;font-weight:bold;}
 .card button:hover{background:#2563eb;}
-
-/* Lista de transações */
 ul{list-style:none;padding:0;margin:0;}
 li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;}
 .dark li{border-bottom:1px solid #334155;}
 li:last-child{border-bottom:none;}
 .del{background:transparent;border:none;cursor:pointer;color:#ef4444;font-size:18px;padding:5px;transition:0.3s;}
 .del:hover{transform:scale(1.2);}
-
-/* Responsivo */
 @media(max-width:480px){.container{padding:10px;}.card{padding:15px;}.topbar{flex-direction:column;align-items:flex-start;}.dashboard{grid-template-columns:1fr;}.perfil{width:100%;justify-content:space-between;}}
 </style>
 </head>
@@ -145,6 +127,8 @@ li:last-child{border-bottom:none;}
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded",()=>{
+
 // Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
@@ -158,41 +142,38 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
+let uid=null,dados=[],grafico=null;
+const formatarMoeda=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
 
-// Variáveis
-let uid = null, dados=[], grafico=null;
-
-// Função moeda
-const formatarMoeda = v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+if(localStorage.getItem("tema")==="dark") document.body.classList.add("dark");
 
 // Tema
-if(localStorage.getItem("tema")==="dark") document.body.classList.add("dark");
-function tema(){
+window.tema=()=>{
   document.body.classList.toggle("dark");
   localStorage.setItem("tema",document.body.classList.contains("dark")?"dark":"light");
-  const btnIcon=document.querySelector('.iconBtn[onclick="tema()"] i');
-  btnIcon.className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
-}
+  document.querySelector('.iconBtn[onclick="tema()"] i').className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
+};
 
-// Autenticação
+// Auth
 auth.onAuthStateChanged(user=>{
   if(user){
     uid=user.uid;
     document.getElementById("emailUser").innerText=user.email;
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
     carregarDados();
-  } else {
-    document.getElementById("login").style.display="flex";
-    document.getElementById("app").style.display="none";
+  }else{
+    document.getElementById("login").classList.remove("hidden");
+    document.getElementById("app").classList.add("hidden");
   }
 });
 
-function registrar(){
+// Registro
+window.registrar=()=>{
   const email=document.getElementById("email").value;
   const senha=document.getElementById("senha").value;
-  if(!email||!senha) return alert("Preencha email e senha!");
-  if(senha.length<6) return alert("Senha deve ter no mínimo 6 caracteres!");
+  if(!email||!senha)return alert("Preencha email e senha!");
+  if(senha.length<6)return alert("Senha deve ter no mínimo 6 caracteres!");
   const btn=document.getElementById("btnRegistrar");
   btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...';
   btn.disabled=true;
@@ -200,33 +181,35 @@ function registrar(){
   .then(()=>{alert("Conta criada!");document.getElementById("email").value="";document.getElementById("senha").value="";})
   .catch(e=>alert("Erro: "+e.message))
   .finally(()=>{btn.innerHTML='Criar conta';btn.disabled=false;});
-}
+};
 
-function login(){
+// Login
+window.login=()=>{
   const email=document.getElementById("email").value;
   const senha=document.getElementById("senha").value;
-  if(!email||!senha) return alert("Preencha email e senha!");
+  if(!email||!senha)return alert("Preencha email e senha!");
   const btn=document.getElementById("btnLogin");
   btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...';
   btn.disabled=true;
   auth.signInWithEmailAndPassword(email,senha)
   .catch(e=>{alert("Erro: "+e.message);btn.innerHTML='Entrar';btn.disabled=false;});
-}
+};
 
-function logout(){auth.signOut();location.reload();}
+// Logout
+window.logout=()=>{auth.signOut();location.reload();};
 
 // Dados
 function carregarDados(){
   db.ref("dados/"+uid).on("value",snap=>{
     dados=[]; const lista=document.getElementById("lista"); lista.innerHTML="";
-    let totalReceita=0, totalGasto=0;
+    let totalReceita=0,totalGasto=0;
     snap.forEach(i=>{
-      const d=i.val(); const key=i.key; dados.push({...d,key});
+      const d=i.val(),key=i.key; dados.push({...d,key});
       let li=document.createElement("li");
-      li.innerHTML=`<span>${d.data} ${d.tipo==="gasto"?"-":"+"} ${formatarMoeda(d.valor)}</span>
+      li.innerHTML=`<span>${d.data} ${d.tipo==="gasto"?'-':'+'} ${formatarMoeda(d.valor)}</span>
       <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
       lista.appendChild(li);
-      if(d.tipo==="receita") totalReceita+=d.valor; else totalGasto+=d.valor;
+      if(d.tipo==="receita")totalReceita+=d.valor;else totalGasto+=d.valor;
     });
     document.getElementById("totalReceita").innerText=formatarMoeda(totalReceita);
     document.getElementById("totalGasto").innerText=formatarMoeda(totalGasto);
@@ -235,35 +218,33 @@ function carregarDados(){
   });
 }
 
-function addReceita(){
-  if(!uid) return;
+window.addReceita=()=>{
+  if(!uid)return;
   let valor=Number(document.getElementById("receitaValor").value);
-  if(!valor) return alert("Digite um valor!");
-  db.ref("dados/"+uid).push({tipo:"receita",valor:dataNumber(valor),data:new Date().toLocaleDateString()});
+  if(!valor)return alert("Digite um valor!");
+  db.ref("dados/"+uid).push({tipo:"receita",valor:Number(valor.toFixed(2)),data:new Date().toLocaleDateString()});
   document.getElementById("receitaValor").value="";
-}
+};
 
-function addGasto(){
-  if(!uid) return;
+window.addGasto=()=>{
+  if(!uid)return;
   let valor=Number(document.getElementById("gastoValor").value);
   let cat=document.getElementById("categoria").value;
-  if(!valor) return alert("Digite um valor!");
-  db.ref("dados/"+uid).push({tipo:"gasto",valor:dataNumber(valor),categoria:cat,data:new Date().toLocaleDateString()});
+  if(!valor)return alert("Digite um valor!");
+  db.ref("dados/"+uid).push({tipo:"gasto",valor:Number(valor.toFixed(2)),categoria:cat,data:new Date().toLocaleDateString()});
   document.getElementById("gastoValor").value="";
-}
+};
 
-function deletar(key){if(!uid) return; db.ref("dados/"+uid+"/"+key).remove();}
+window.deletar=(key)=>{if(!uid)return;db.ref("dados/"+uid+"/"+key).remove();};
 
 function atualizarGrafico(){
-  const ctx=document.getElementById("grafico");
-  let categorias={};
-  dados.forEach(d=>{if(d.tipo==="gasto"){categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor;}});
-  if(grafico) grafico.destroy();
+  const ctx=document.getElementById("grafico"); let categorias={};
+  dados.forEach(d=>{if(d.tipo==="gasto")categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor;});
+  if(grafico)grafico.destroy();
   grafico=new Chart(ctx,{type:'pie',data:{labels:Object.keys(categorias),datasets:[{data:Object.values(categorias),backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
 }
 
-function dataNumber(v){return Number(v.toFixed(2));}
-
+});
 </script>
 </body>
 </html>
