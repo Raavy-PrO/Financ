@@ -1,1 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Finanças</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+margin:0;
+padding:20px;
+}
+
+.container{
+max-width:520px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+}
+
+.card{
+background:#1e293b;
+padding:18px;
+border-radius:12px;
+margin-top:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.4);
+}
+
+.saldo{
+font-size:28px;
+font-weight:bold;
+}
+
+.verde{color:#22c55e;}
+.vermelho{color:#ef4444;}
+
+input,select,button{
+width:100%;
+padding:10px;
+margin-top:8px;
+border-radius:8px;
+border:none;
+font-size:15px;
+}
+
+button{
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+.gasto{background:#ef4444;}
+.meta{background:#06b6d4;}
+.reset{background:#f59e0b;}
+
+ul{
+list-style:none;
+padding:0;
+}
+
+li{
+display:flex;
+justify-content:space-between;
+background:#0f172a;
+padding:8px;
+border-radius:6px;
+margin-top:6px;
+}
+
+canvas{
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💳 Minhas Finanças</h1>
+
+<div class="card">
+
+Saldo atual
+
+<div id="saldo" class="saldo">R$0</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Adicionar Receita</h3>
+
+<input type="number" id="receitaValor" placeholder="Valor">
+
+<button onclick="addReceita()">Adicionar</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Adicionar Gasto</h3>
+
+<input type="number" id="gastoValor" placeholder="Valor">
+
+<select id="categoria">
+
+<option>Comida</option>
+<option>Transporte</option>
+<option>Casa</option>
+<option>Lazer</option>
+<option>Outros</option>
+
+</select>
+
+<button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Meta de economia</h3>
+
+<input type="number" id="metaValor" placeholder="Meta mensal">
+
+<button class="meta" onclick="salvarMeta()">Salvar</button>
+
+<p id="metaTexto"></p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Histórico</h3>
+
+<ul id="lista"></ul>
+
+</div>
+
+
+<div class="card">
+
+<h3>Gastos por categoria</h3>
+
+<canvas id="graficoCategoria"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h3>Evolução do saldo</h3>
+
+<canvas id="graficoSaldo"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h3>Relatório</h3>
+
+<p id="relatorio"></p>
+
+<button class="reset" onclick="resetar()">Limpar Dados</button>
+
+</div>
+
+</div>
+
+<script>
+
+let dados = JSON.parse(localStorage.getItem("dados")) || []
+let meta = Number(localStorage.getItem("meta")) || 0
+
+let graficoCategoria
+let graficoSaldo
+
+function salvar(){
+localStorage.setItem("dados",JSON.stringify(dados))
+}
+
+function dataHoje(){
+return new Date().toISOString().split("T")[0]
+}
+
+function atualizar(){
+
+let saldo=0
+
+let lista=document.getElementById("lista")
+lista.innerHTML=""
+
+let categorias={
+Comida:0,
+Transporte:0,
+Casa:0,
+Lazer:0,
+Outros:0
+}
+
+let evolucao=[]
+
+dados.forEach((item,i)=>{
+
+if(item.tipo=="receita"){
+saldo+=item.valor
+}else{
+saldo-=item.valor
+categorias[item.categoria]+=item.valor
+}
+
+evolucao.push(saldo)
+
+let li=document.createElement("li")
+
+li.innerHTML=`
+<span>${item.data} - ${item.tipo} R$${item.valor}</span>
+<button onclick="remover(${i})">X</button>
+`
+
+lista.appendChild(li)
+
+})
+
+let saldoElemento=document.getElementById("saldo")
+
+saldoElemento.innerText="R$ "+saldo.toFixed(2)
+
+saldoElemento.className="saldo "+(saldo>=0?"verde":"vermelho")
+
+desenharGraficoCategoria(categorias)
+desenharGraficoSaldo(evolucao)
+
+mostrarMeta(saldo)
+gerarRelatorio()
+
+}
+
+function addReceita(){
+
+let valor=Number(document.getElementById("receitaValor").value)
+
+if(!valor || valor<=0)return
+
+dados.push({
+tipo:"receita",
+valor:valor,
+data:dataHoje()
+})
+
+salvar()
+atualizar()
+
+}
+
+function addGasto(){
+
+let valor=Number(document.getElementById("gastoValor").value)
+let categoria=document.getElementById("categoria").value
+
+if(!valor || valor<=0)return
+
+dados.push({
+tipo:"gasto",
+valor:valor,
+categoria:categoria,
+data:dataHoje()
+})
+
+salvar()
+atualizar()
+
+}
+
+function remover(i){
+
+dados.splice(i,1)
+
+salvar()
+atualizar()
+
+}
+
+function salvarMeta(){
+
+meta=Number(document.getElementById("metaValor").value)
+
+localStorage.setItem("meta",meta)
+
+atualizar()
+
+}
+
+function mostrarMeta(saldo){
+
+let texto=document.getElementById("metaTexto")
+
+if(meta>0){
+
+let progresso=((saldo/meta)*100).toFixed(1)
+
+texto.innerText=`Meta: R$${meta} | ${progresso}% concluído`
+
+}
+
+}
+
+function desenharGraficoCategoria(categorias){
+
+let ctx=document.getElementById("graficoCategoria")
+
+if(graficoCategoria)graficoCategoria.destroy()
+
+graficoCategoria=new Chart(ctx,{
+type:"doughnut",
+data:{
+labels:Object.keys(categorias),
+datasets:[{data:Object.values(categorias)}]
+}
+})
+
+}
+
+function desenharGraficoSaldo(dados){
+
+let ctx=document.getElementById("graficoSaldo")
+
+if(graficoSaldo)graficoSaldo.destroy()
+
+graficoSaldo=new Chart(ctx,{
+type:"line",
+data:{
+labels:dados.map((_,i)=>i+1),
+datasets:[{data:dados}]
+}
+})
+
+}
+
+function gerarRelatorio(){
+
+let receitas=0
+let gastos=0
+
+dados.forEach(d=>{
+
+if(d.tipo=="receita")receitas+=d.valor
+else gastos+=d.valor
+
+})
+
+let saldo=receitas-gastos
+
+document.getElementById("relatorio").innerText=
+`Receitas: R$${receitas}
+Gastos: R$${gastos}
+Saldo: R$${saldo}`
+
+}
+
+function resetar(){
+
+if(confirm("Apagar todos os dados?")){
+
+localStorage.clear()
+location.reload()
+
+}
+
+}
+
+atualizar()
+
+</script>
+
+</body>
+</html>
