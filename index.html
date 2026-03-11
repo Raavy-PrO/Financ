@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Controle Financeiro</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family: Arial;
+background:#121212;
+color:white;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+.card{
+background:#1f1f1f;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+}
+
+input,select,button{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:6px;
+}
+
+button{
+background:#00c853;
+color:white;
+cursor:pointer;
+}
+
+.gastoBtn{
+background:#ff5252;
+}
+
+li{
+margin:8px 0;
+display:flex;
+justify-content:space-between;
+}
+
+.apagar{
+background:#ff5252;
+padding:5px 10px;
+border-radius:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>💰 Minhas Finanças</h1>
+
+<div class="card">
+
+<h3>Adicionar Receita</h3>
+
+<input type="number" id="receitaValor" placeholder="Valor">
+<input type="date" id="receitaData">
+
+<button onclick="addReceita()">Adicionar</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Adicionar Gasto</h3>
+
+<input type="number" id="gastoValor" placeholder="Valor">
+
+<select id="categoria">
+<option>Comida</option>
+<option>Transporte</option>
+<option>Casa</option>
+<option>Lazer</option>
+<option>Outros</option>
+</select>
+
+<input type="date" id="gastoData">
+
+<button class="gastoBtn" onclick="addGasto()">Adicionar</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>Saldo Atual: R$ <span id="saldo">0</span></h2>
+
+</div>
+
+
+<div class="card">
+
+<h3>Histórico</h3>
+
+<ul id="lista"></ul>
+
+</div>
+
+
+<div class="card">
+
+<h3>Gráfico de Gastos</h3>
+
+<canvas id="grafico"></canvas>
+
+</div>
+
+
+<script>
+
+let dados = JSON.parse(localStorage.getItem("financas")) || []
+
+function salvar(){
+localStorage.setItem("financas",JSON.stringify(dados))
+}
+
+function atualizar(){
+
+let saldo = 0
+let lista = document.getElementById("lista")
+lista.innerHTML=""
+
+let categorias = {
+Comida:0,
+Transporte:0,
+Casa:0,
+Lazer:0,
+Outros:0
+}
+
+dados.forEach((item,index)=>{
+
+if(item.tipo==="receita"){
+saldo += item.valor
+}else{
+saldo -= item.valor
+categorias[item.categoria]+=item.valor
+}
+
+let li = document.createElement("li")
+
+li.innerHTML = `
+${item.data} - ${item.tipo} - R$ ${item.valor}
+<button class="apagar" onclick="remover(${index})">X</button>
+`
+
+lista.appendChild(li)
+
+})
+
+document.getElementById("saldo").innerText = saldo.toFixed(2)
+
+desenharGrafico(categorias)
+
+}
+
+function addReceita(){
+
+let valor = Number(document.getElementById("receitaValor").value)
+let data = document.getElementById("receitaData").value
+
+dados.push({
+tipo:"receita",
+valor:valor,
+data:data
+})
+
+salvar()
+atualizar()
+
+}
+
+function addGasto(){
+
+let valor = Number(document.getElementById("gastoValor").value)
+let data = document.getElementById("gastoData").value
+let categoria = document.getElementById("categoria").value
+
+dados.push({
+tipo:"gasto",
+valor:valor,
+data:data,
+categoria:categoria
+})
+
+salvar()
+atualizar()
+
+}
+
+function remover(i){
+
+dados.splice(i,1)
+
+salvar()
+atualizar()
+
+}
+
+let grafico
+
+function desenharGrafico(categorias){
+
+let ctx = document.getElementById("grafico")
+
+if(grafico){
+grafico.destroy()
+}
+
+grafico = new Chart(ctx,{
+type:"pie",
+data:{
+labels:Object.keys(categorias),
+datasets:[{
+data:Object.values(categorias)
+}]
+}
+})
+
+}
+
+atualizar()
+
+</script>
+
+</body>
+
+</html>
