@@ -12,41 +12,30 @@
 <style>
 
 body{
-font-family: Arial;
-background:#0f172a;
-color:white;
 margin:0;
-padding:20px;
+font-family:Arial;
+background:#820ad1;
+color:white;
 }
 
 .container{
-max-width:520px;
+max-width:420px;
 margin:auto;
-}
-
-h1{
-text-align:center;
+padding:20px;
 }
 
 .card{
-background:#1e293b;
+background:white;
+color:black;
 padding:18px;
-border-radius:12px;
+border-radius:14px;
 margin-top:15px;
-box-shadow:0 5px 20px rgba(0,0,0,0.4);
+box-shadow:0 6px 20px rgba(0,0,0,0.25);
 }
-
-.saldo{
-font-size:28px;
-font-weight:bold;
-}
-
-.verde{color:#22c55e;}
-.vermelho{color:#ef4444;}
 
 input,select,button{
 width:100%;
-padding:10px;
+padding:12px;
 margin-top:8px;
 border-radius:8px;
 border:none;
@@ -54,14 +43,22 @@ font-size:15px;
 }
 
 button{
-background:#2563eb;
+background:#820ad1;
 color:white;
 cursor:pointer;
 }
 
-.gasto{background:#ef4444;}
-.meta{background:#06b6d4;}
-.reset{background:#f59e0b;}
+.gasto{
+background:#ef4444;
+}
+
+.saldo{
+font-size:32px;
+font-weight:bold;
+}
+
+.verde{color:#16a34a}
+.vermelho{color:#dc2626}
 
 ul{
 list-style:none;
@@ -71,28 +68,51 @@ padding:0;
 li{
 display:flex;
 justify-content:space-between;
-background:#0f172a;
-padding:8px;
-border-radius:6px;
 margin-top:6px;
 }
 
-canvas{
-margin-top:10px;
+.login{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+}
+
+.login input{
+max-width:300px;
+}
+
+.hidden{
+display:none;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div id="loginTela" class="login">
 
-<h1>💳 Minhas Finanças</h1>
+<h2>💜 Minhas Finanças</h2>
+
+<input id="nome" placeholder="Seu nome">
+
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="entrar()">Entrar</button>
+
+</div>
+
+
+<div id="app" class="container hidden">
+
+<h2 id="boasVindas"></h2>
 
 <div class="card">
 
-Saldo atual
+Saldo
 
 <div id="saldo" class="saldo">R$0</div>
 
@@ -101,7 +121,7 @@ Saldo atual
 
 <div class="card">
 
-<h3>Adicionar Receita</h3>
+<h3>Receita</h3>
 
 <input type="number" id="receitaValor" placeholder="Valor">
 
@@ -112,11 +132,11 @@ Saldo atual
 
 <div class="card">
 
-<h3>Adicionar Gasto</h3>
+<h3>Gasto</h3>
 
 <input type="number" id="gastoValor" placeholder="Valor">
 
-<select id="categoria">
+<select id="categoria" onchange="mostrarOutro()">
 
 <option>Comida</option>
 <option>Transporte</option>
@@ -126,20 +146,9 @@ Saldo atual
 
 </select>
 
+<input id="outroCampo" class="hidden" placeholder="Qual gasto?">
+
 <button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
-
-</div>
-
-
-<div class="card">
-
-<h3>Meta de economia</h3>
-
-<input type="number" id="metaValor" placeholder="Meta mensal">
-
-<button class="meta" onclick="salvarMeta()">Salvar</button>
-
-<p id="metaTexto"></p>
 
 </div>
 
@@ -155,29 +164,9 @@ Saldo atual
 
 <div class="card">
 
-<h3>Gastos por categoria</h3>
+<h3>Gastos</h3>
 
-<canvas id="graficoCategoria"></canvas>
-
-</div>
-
-
-<div class="card">
-
-<h3>Evolução do saldo</h3>
-
-<canvas id="graficoSaldo"></canvas>
-
-</div>
-
-
-<div class="card">
-
-<h3>Relatório</h3>
-
-<p id="relatorio"></p>
-
-<button class="reset" onclick="resetar()">Limpar Dados</button>
+<canvas id="grafico"></canvas>
 
 </div>
 
@@ -186,69 +175,61 @@ Saldo atual
 <script>
 
 let dados = JSON.parse(localStorage.getItem("dados")) || []
-let meta = Number(localStorage.getItem("meta")) || 0
 
-let graficoCategoria
-let graficoSaldo
+let grafico
 
-function salvar(){
-localStorage.setItem("dados",JSON.stringify(dados))
+function entrar(){
+
+let nome=document.getElementById("nome").value
+let senha=document.getElementById("senha").value
+
+if(!nome || !senha){
+
+alert("Digite nome e senha")
+
+return
+
+}
+
+localStorage.setItem("usuario",nome)
+
+document.getElementById("loginTela").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
+
+document.getElementById("boasVindas").innerText="Olá, "+nome
+
+atualizar()
+
+}
+
+if(localStorage.getItem("usuario")){
+
+document.getElementById("loginTela").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
+
+document.getElementById("boasVindas").innerText="Olá, "+localStorage.getItem("usuario")
+
 }
 
 function dataHoje(){
+
 return new Date().toISOString().split("T")[0]
+
 }
 
-function atualizar(){
+function mostrarOutro(){
 
-let saldo=0
+let categoria=document.getElementById("categoria").value
 
-let lista=document.getElementById("lista")
-lista.innerHTML=""
+if(categoria==="Outros"){
 
-let categorias={
-Comida:0,
-Transporte:0,
-Casa:0,
-Lazer:0,
-Outros:0
-}
+document.getElementById("outroCampo").classList.remove("hidden")
 
-let evolucao=[]
-
-dados.forEach((item,i)=>{
-
-if(item.tipo=="receita"){
-saldo+=item.valor
 }else{
-saldo-=item.valor
-categorias[item.categoria]+=item.valor
+
+document.getElementById("outroCampo").classList.add("hidden")
+
 }
-
-evolucao.push(saldo)
-
-let li=document.createElement("li")
-
-li.innerHTML=`
-<span>${item.data} - ${item.tipo} R$${item.valor}</span>
-<button onclick="remover(${i})">X</button>
-`
-
-lista.appendChild(li)
-
-})
-
-let saldoElemento=document.getElementById("saldo")
-
-saldoElemento.innerText="R$ "+saldo.toFixed(2)
-
-saldoElemento.className="saldo "+(saldo>=0?"verde":"vermelho")
-
-desenharGraficoCategoria(categorias)
-desenharGraficoSaldo(evolucao)
-
-mostrarMeta(saldo)
-gerarRelatorio()
 
 }
 
@@ -256,132 +237,126 @@ function addReceita(){
 
 let valor=Number(document.getElementById("receitaValor").value)
 
-if(!valor || valor<=0)return
+if(!valor)return
 
 dados.push({
+
 tipo:"receita",
 valor:valor,
 data:dataHoje()
+
 })
 
 salvar()
-atualizar()
 
 }
 
 function addGasto(){
 
 let valor=Number(document.getElementById("gastoValor").value)
+
 let categoria=document.getElementById("categoria").value
 
-if(!valor || valor<=0)return
+if(categoria==="Outros"){
+
+categoria=document.getElementById("outroCampo").value
+
+}
+
+if(!valor)return
 
 dados.push({
+
 tipo:"gasto",
 valor:valor,
 categoria:categoria,
 data:dataHoje()
+
 })
 
 salvar()
-atualizar()
 
 }
 
-function remover(i){
+function salvar(){
 
-dados.splice(i,1)
-
-salvar()
-atualizar()
-
-}
-
-function salvarMeta(){
-
-meta=Number(document.getElementById("metaValor").value)
-
-localStorage.setItem("meta",meta)
+localStorage.setItem("dados",JSON.stringify(dados))
 
 atualizar()
 
 }
 
-function mostrarMeta(saldo){
+function atualizar(){
 
-let texto=document.getElementById("metaTexto")
+let saldo=0
 
-if(meta>0){
+let lista=document.getElementById("lista")
 
-let progresso=((saldo/meta)*100).toFixed(1)
+lista.innerHTML=""
 
-texto.innerText=`Meta: R$${meta} | ${progresso}% concluído`
+let categorias={}
+
+dados.forEach((item,i)=>{
+
+if(item.tipo==="receita"){
+
+saldo+=item.valor
+
+}else{
+
+saldo-=item.valor
+
+if(!categorias[item.categoria]){
+
+categorias[item.categoria]=0
 
 }
 
+categorias[item.categoria]+=item.valor
+
 }
 
-function desenharGraficoCategoria(categorias){
+let li=document.createElement("li")
 
-let ctx=document.getElementById("graficoCategoria")
+li.innerHTML=`${item.data} ${item.tipo} R$${item.valor}`
 
-if(graficoCategoria)graficoCategoria.destroy()
+lista.appendChild(li)
 
-graficoCategoria=new Chart(ctx,{
+})
+
+let saldoElemento=document.getElementById("saldo")
+
+saldoElemento.innerText="R$"+saldo.toFixed(2)
+
+saldoElemento.className="saldo "+(saldo>=0?"verde":"vermelho")
+
+desenharGrafico(categorias)
+
+}
+
+function desenharGrafico(categorias){
+
+let ctx=document.getElementById("grafico")
+
+if(grafico)grafico.destroy()
+
+grafico=new Chart(ctx,{
+
 type:"doughnut",
+
 data:{
+
 labels:Object.keys(categorias),
-datasets:[{data:Object.values(categorias)}]
-}
-})
+
+datasets:[{
+
+data:Object.values(categorias)
+
+}]
 
 }
-
-function desenharGraficoSaldo(dados){
-
-let ctx=document.getElementById("graficoSaldo")
-
-if(graficoSaldo)graficoSaldo.destroy()
-
-graficoSaldo=new Chart(ctx,{
-type:"line",
-data:{
-labels:dados.map((_,i)=>i+1),
-datasets:[{data:dados}]
-}
-})
-
-}
-
-function gerarRelatorio(){
-
-let receitas=0
-let gastos=0
-
-dados.forEach(d=>{
-
-if(d.tipo=="receita")receitas+=d.valor
-else gastos+=d.valor
 
 })
-
-let saldo=receitas-gastos
-
-document.getElementById("relatorio").innerText=
-`Receitas: R$${receitas}
-Gastos: R$${gastos}
-Saldo: R$${saldo}`
-
-}
-
-function resetar(){
-
-if(confirm("Apagar todos os dados?")){
-
-localStorage.clear()
-location.reload()
-
-}
 
 }
 
