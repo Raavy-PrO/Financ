@@ -17,6 +17,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-LQ1/L3vJkMk2ZJxZf3qCIRkpZlTpXKXgQMF6nRr+zMxWZkYVv/m1LJ7K+Tv4zD2hRZyZ0WQxf4YIYzGjk5JvZw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
 <body>
 
@@ -33,13 +36,17 @@
 <div id="app" class="container hidden">
 
   <div class="topbar">
-    <div>
-      <div id="emailUser" class="email"></div>
+
+    <button id="temaBtn" onclick="tema()"><i class="fas fa-moon"></i></button>
+
+    <div class="perfil">
+      <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
+      <div class="infoPerfil">
+        <span id="emailUser" class="email"></span>
+        <i class="fas fa-sign-out-alt" onclick="logout()" title="Sair"></i>
+      </div>
     </div>
-    <div>
-      <button onclick="tema()">Tema</button>
-      <button onclick="logout()">Sair</button>
-    </div>
+
   </div>
 
   <div class="card">
