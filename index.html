@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Finanças Pessoais</title>
 
-<!-- Bibliotecas Externas -->
+<!-- Bibliotecas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -13,145 +13,76 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <style>
-* { box-sizing: border-box; }
-body {
+*{box-sizing:border-box;}
+body{
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  background: #f5f6fb;
-  color: #1f2937;
-  transition: 0.3s;
-  min-height: 100vh;
+  margin:0;
+  background:#f5f6fb;
+  color:#1f2937;
+  transition:0.3s;
+  min-height:100vh;
 }
-.dark { background: #0f172a; color: #e2e8f0; }
+.dark{background:#0f172a;color:#e2e8f0;}
+.hidden{display:none !important;}
 
-.hidden { display: none !important; }
+/* Login */
+.loginBox{height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+.loginCard{background:white;padding:30px;border-radius:14px;width:100%;max-width:350px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;transition:0.3s;}
+.dark .loginCard{background:#1e293b;}
+.loginCard h2{margin-bottom:20px;color:#3b82f6;}
+.loginCard input{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:1px solid #ccc;outline:none;transition:0.3s;}
+.dark input{background:#0f172a;color:white;border:1px solid #444;}
+.loginCard input:focus{border-color:#3b82f6;}
+.loginCard button{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:none;cursor:pointer;background:#3b82f6;color:white;transition:0.3s;font-weight:600;}
+.loginCard button:hover{background:#2563eb;}
+.loginCard button:disabled{background:#9ca3af;cursor:not-allowed;}
 
-/* --- LOGIN --- */
-.loginBox { 
-  height: 100vh; 
-  display: flex; 
-  justify-content: center; 
-  align-items: center; 
-  padding: 20px;
-}
-.loginCard {
-  background: white; 
-  padding: 30px; 
-  border-radius: 14px; 
-  width: 100%; 
-  max-width: 350px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-  text-align: center; 
-  transition: 0.3s;
-}
-.dark .loginCard { background: #1e293b; }
-.loginCard h2 { margin-bottom: 20px; color: #3b82f6; }
-.loginCard input {
-  width: 100%; 
-  margin-top: 10px; 
-  padding: 12px; 
-  border-radius: 8px; 
-  font-size: 14px;
-  border: 1px solid #ccc; 
-  outline: none;
-  transition: 0.3s;
-}
-.dark input { background: #0f172a; color:white; border:1px solid #444; }
-.loginCard input:focus { border-color: #3b82f6; }
-.loginCard button {
-  width: 100%; 
-  margin-top: 10px; 
-  padding: 12px; 
-  border-radius: 8px; 
-  font-size: 14px;
-  border: none; 
-  cursor: pointer; 
-  background: #3b82f6; 
-  color: white; 
-  transition: 0.3s;
-  font-weight: 600;
-}
-.loginCard button:hover { background: #2563eb; }
-.loginCard button:disabled { background: #9ca3af; cursor: not-allowed; }
-
-/* --- APP --- */
-.container { max-width: 420px; margin: auto; padding: 20px; padding-bottom: 80px; }
+/* App */
+.container{max-width:420px;margin:auto;padding:20px;padding-bottom:80px;}
 
 /* Topbar */
-.topbar { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  margin-bottom: 15px; 
-  gap: 10px; 
-}
-.iconBtn {
-  background: #3b82f6; 
-  color: white; 
-  border: none; 
-  border-radius: 50%;
-  width: 40px; 
-  height: 40px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
-  cursor: pointer; 
-  font-size: 16px; 
-  transition: 0.3s;
-}
-.iconBtn:hover { background: #2563eb; }
-.perfil {
-  display: flex; 
-  align-items: center; 
-  background: #e0e0e0; 
-  border-radius: 30px;
-  padding: 5px 10px; 
-  gap: 10px;
-}
-.dark .perfil { background: #1e293b; }
-.fotoPerfil { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-.infoPerfil { display: flex; align-items: center; gap: 10px; }
-.email { font-size: 14px; opacity: 0.9; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;}
+.iconBtn{background:#3b82f6;color:white;border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:0.3s;}
+.iconBtn:hover{background:#2563eb;}
+.perfil{display:flex;align-items:center;background:#e0e0e0;border-radius:30px;padding:5px 10px;gap:10px;}
+.dark .perfil{background:#1e293b;}
+.fotoPerfil{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+.infoPerfil{display:flex;align-items:center;gap:10px;}
+.email{font-size:14px;opacity:0.9;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 /* Dashboard Cards */
-.dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-.box { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s; }
-.dark .box { background: #1e293b; }
-.box:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-.verde { color: #10b981; }
-.vermelho { color: #ef4444; }
-.saldo { font-size: 28px; font-weight: bold; margin-top: 5px; }
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
+.box{background:white;padding:15px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.08);transition: transform 0.3s, box-shadow 0.3s;}
+.dark .box{background:#1e293b;}
+.box:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.15);}
+.verde{color:#10b981;}
+.vermelho{color:#ef4444;}
+.saldo{font-size:28px;font-weight:bold;margin-top:5px;}
 
-/* Cards de Ação */
-.card { background: white; padding: 20px; border-radius: 12px; margin-top: 15px; transition: 0.3s; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-.dark .card { background: #1e293b; }
-.card h3 { margin-top: 0; margin-bottom: 15px; font-size: 16px; }
-.card input, .card select { width: 100%; padding: 12px; margin-top: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
-.dark .card input, .dark .card select { background: #0f172a; color: white; border: 1px solid #444; }
-.card button { width: 100%; margin-top: 10px; padding: 12px; border-radius: 8px; border: none; cursor: pointer; background: #3b82f6; color: white; font-weight: bold; }
-.card button:hover { background: #2563eb; }
+/* Cards de ação */
+.card{background:white;padding:20px;border-radius:12px;margin-top:15px;transition:0.3s;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+.dark .card{background:#1e293b;}
+.card h3{margin-top:0;margin-bottom:15px;font-size:16px;}
+.card input,.card select{width:100%;padding:12px;margin-top:8px;border-radius:8px;border:1px solid #ccc;font-size:14px;}
+.dark .card input,.dark .card select{background:#0f172a;color:white;border:1px solid #444;}
+.card button{width:100%;margin-top:10px;padding:12px;border-radius:8px;border:none;cursor:pointer;background:#3b82f6;color:white;font-weight:bold;}
+.card button:hover{background:#2563eb;}
 
-/* Lista de Transações */
-ul { list-style: none; padding: 0; margin: 0; }
-li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-.dark li { border-bottom: 1px solid #334155; }
-li:last-child { border-bottom: none; }
-.del { background: transparent; border: none; cursor: pointer; color: #ef4444; font-size: 18px; padding: 5px; transition: 0.3s; }
-.del:hover { transform: scale(1.2); }
+/* Lista de transações */
+ul{list-style:none;padding:0;margin:0;}
+li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;}
+.dark li{border-bottom:1px solid #334155;}
+li:last-child{border-bottom:none;}
+.del{background:transparent;border:none;cursor:pointer;color:#ef4444;font-size:18px;padding:5px;transition:0.3s;}
+.del:hover{transform:scale(1.2);}
 
 /* Responsivo */
-@media (max-width: 480px) {
-  .container { padding: 10px; }
-  .card { padding: 15px; }
-  .topbar { flex-direction: column; align-items: flex-start; }
-  .dashboard { grid-template-columns: 1fr; }
-  .perfil { width: 100%; justify-content: space-between; }
-}
+@media(max-width:480px){.container{padding:10px;}.card{padding:15px;}.topbar{flex-direction:column;align-items:flex-start;}.dashboard{grid-template-columns:1fr;}.perfil{width:100%;justify-content:space-between;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- Login -->
 <div id="login" class="loginBox">
   <div class="loginCard">
     <h2>💰 Controle Financeiro</h2>
@@ -162,12 +93,10 @@ li:last-child { border-bottom: none; }
   </div>
 </div>
 
-<!-- APP -->
+<!-- App -->
 <div id="app" class="container hidden">
   <div class="topbar">
-    <button class="iconBtn" onclick="tema()" title="Alternar Tema">
-      <i class="fas fa-moon"></i>
-    </button>
+    <button class="iconBtn" onclick="tema()" title="Alternar Tema"><i class="fas fa-moon"></i></button>
     <div class="perfil">
       <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
       <div class="infoPerfil">
@@ -179,30 +108,18 @@ li:last-child { border-bottom: none; }
     </div>
   </div>
 
-  <!-- Dashboard -->
   <div class="dashboard">
-    <div class="box">
-      <div>Saldo Atual</div>
-      <div id="saldo" class="saldo">R$0,00</div>
-    </div>
-    <div class="box">
-      <div>Receitas</div>
-      <div id="totalReceita" class="verde">R$0,00</div>
-    </div>
-    <div class="box">
-      <div>Gastos</div>
-      <div id="totalGasto" class="vermelho">R$0,00</div>
-    </div>
+    <div class="box"><div>Saldo Atual</div><div id="saldo" class="saldo">R$0,00</div></div>
+    <div class="box"><div>Receitas</div><div id="totalReceita" class="verde">R$0,00</div></div>
+    <div class="box"><div>Gastos</div><div id="totalGasto" class="vermelho">R$0,00</div></div>
   </div>
 
-  <!-- Nova Receita -->
   <div class="card">
     <h3>💰 Nova Receita</h3>
     <input id="receitaValor" type="number" placeholder="Valor (ex: 1500)" step="0.01">
     <button onclick="addReceita()"><i class="fas fa-plus"></i> Adicionar Receita</button>
   </div>
 
-  <!-- Novo Gasto -->
   <div class="card">
     <h3>💸 Novo Gasto</h3>
     <input id="gastoValor" type="number" placeholder="Valor (ex: 50)" step="0.01">
@@ -216,13 +133,11 @@ li:last-child { border-bottom: none; }
     <button onclick="addGasto()"><i class="fas fa-minus"></i> Adicionar Gasto</button>
   </div>
 
-  <!-- Gráfico -->
   <div class="card">
     <h3>📊 Distribuição de Gastos</h3>
     <canvas id="grafico"></canvas>
   </div>
 
-  <!-- Extrato -->
   <div class="card">
     <h3>📜 Extrato Recente</h3>
     <ul id="lista"></ul>
@@ -230,7 +145,7 @@ li:last-child { border-bottom: none; }
 </div>
 
 <script>
-// --- FIREBASE ---
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
   authDomain: "deliciacity-df6cf.firebaseapp.com",
@@ -244,134 +159,111 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-let uid = null;
-let dados = [];
-let grafico = null;
+// Variáveis
+let uid = null, dados=[], grafico=null;
 
-// --- FORMATAÇÃO DE MOEDA ---
-const formatarMoeda = valor => new Intl.NumberFormat('pt-BR',{ style:'currency', currency:'BRL'}).format(valor);
+// Função moeda
+const formatarMoeda = v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
 
-// --- TEMA ---
-if(localStorage.getItem("tema")==="dark") {
-  document.body.classList.add("dark");
-  document.querySelector('.iconBtn[onclick="tema()"] i').className = "fas fa-sun";
-}
-
+// Tema
+if(localStorage.getItem("tema")==="dark") document.body.classList.add("dark");
 function tema(){
   document.body.classList.toggle("dark");
-  const btn = document.querySelector('.iconBtn[onclick="tema()"] i');
-  if(document.body.classList.contains("dark")){
-    localStorage.setItem("tema","dark");
-    btn.className="fas fa-sun";
-  } else {
-    localStorage.setItem("tema","light");
-    btn.className="fas fa-moon";
-  }
+  localStorage.setItem("tema",document.body.classList.contains("dark")?"dark":"light");
+  const btnIcon=document.querySelector('.iconBtn[onclick="tema()"] i');
+  btnIcon.className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
 }
 
-// --- AUTENTICAÇÃO ---
-auth.onAuthStateChanged(user => {
+// Autenticação
+auth.onAuthStateChanged(user=>{
   if(user){
     uid=user.uid;
     document.getElementById("emailUser").innerText=user.email;
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
     carregarDados();
   } else {
-    document.getElementById("login").classList.remove("hidden");
-    document.getElementById("app").classList.add("hidden");
+    document.getElementById("login").style.display="flex";
+    document.getElementById("app").style.display="none";
   }
 });
 
 function registrar(){
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
-  if(!email || !senha) return alert("Preencha email e senha!");
+  const email=document.getElementById("email").value;
+  const senha=document.getElementById("senha").value;
+  if(!email||!senha) return alert("Preencha email e senha!");
   if(senha.length<6) return alert("Senha deve ter no mínimo 6 caracteres!");
-  const btn = document.getElementById("btnRegistrar");
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...'; btn.disabled=true;
-  auth.createUserWithEmailAndPassword(email, senha)
-  .then(()=>{ alert("Conta criada com sucesso!"); document.getElementById("email").value=""; document.getElementById("senha").value=""; })
+  const btn=document.getElementById("btnRegistrar");
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...';
+  btn.disabled=true;
+  auth.createUserWithEmailAndPassword(email,senha)
+  .then(()=>{alert("Conta criada!");document.getElementById("email").value="";document.getElementById("senha").value="";})
   .catch(e=>alert("Erro: "+e.message))
-  .finally(()=>{ btn.innerHTML='Criar conta'; btn.disabled=false; });
+  .finally(()=>{btn.innerHTML='Criar conta';btn.disabled=false;});
 }
 
 function login(){
   const email=document.getElementById("email").value;
   const senha=document.getElementById("senha").value;
-  if(!email || !senha) return alert("Preencha email e senha!");
-  const btn=document.getElementById("btnLogin"); btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...'; btn.disabled=true;
-  auth.signInWithEmailAndPassword(email, senha)
-  .catch(e=>{ alert("Erro: "+e.message); btn.innerHTML='Entrar'; btn.disabled=false; });
+  if(!email||!senha) return alert("Preencha email e senha!");
+  const btn=document.getElementById("btnLogin");
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...';
+  btn.disabled=true;
+  auth.signInWithEmailAndPassword(email,senha)
+  .catch(e=>{alert("Erro: "+e.message);btn.innerHTML='Entrar';btn.disabled=false;});
 }
 
-function logout(){
-  auth.signOut();
-}
+function logout(){auth.signOut();location.reload();}
 
-// --- DADOS ---
+// Dados
 function carregarDados(){
-  db.ref("dados/"+uid).on("value", snap=>{
-    dados=[];
-    const lista=document.getElementById("lista");
-    lista.innerHTML="";
+  db.ref("dados/"+uid).on("value",snap=>{
+    dados=[]; const lista=document.getElementById("lista"); lista.innerHTML="";
     let totalReceita=0, totalGasto=0;
     snap.forEach(i=>{
-      let d=i.val(), key=i.key;
-      dados.push({...d,key});
+      const d=i.val(); const key=i.key; dados.push({...d,key});
       let li=document.createElement("li");
-      li.innerHTML=`<span>${d.data} - ${d.tipo==="receita"? "💰" : "💸"} ${formatarMoeda(d.valor)}</span>
-                    <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
+      li.innerHTML=`<span>${d.data} ${d.tipo==="gasto"?"-":"+"} ${formatarMoeda(d.valor)}</span>
+      <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
       lista.appendChild(li);
-      if(d.tipo==="receita") totalReceita+=d.valor;
-      else totalGasto+=d.valor;
+      if(d.tipo==="receita") totalReceita+=d.valor; else totalGasto+=d.valor;
     });
-    document.getElementById("saldo").innerText=formatarMoeda(totalReceita-totalGasto);
     document.getElementById("totalReceita").innerText=formatarMoeda(totalReceita);
     document.getElementById("totalGasto").innerText=formatarMoeda(totalGasto);
+    document.getElementById("saldo").innerText=formatarMoeda(totalReceita-totalGasto);
     atualizarGrafico();
   });
 }
 
 function addReceita(){
   if(!uid) return;
-  let valor=parseFloat(document.getElementById("receitaValor").value);
+  let valor=Number(document.getElementById("receitaValor").value);
   if(!valor) return alert("Digite um valor!");
-  const item={tipo:"receita", valor:valor, data:new Date().toLocaleDateString()};
-  db.ref("dados/"+uid).push(item);
+  db.ref("dados/"+uid).push({tipo:"receita",valor:dataNumber(valor),data:new Date().toLocaleDateString()});
   document.getElementById("receitaValor").value="";
 }
 
 function addGasto(){
   if(!uid) return;
-  let valor=parseFloat(document.getElementById("gastoValor").value);
-  if(!valor) return alert("Digite um valor!");
+  let valor=Number(document.getElementById("gastoValor").value);
   let cat=document.getElementById("categoria").value;
-  const item={tipo:"gasto", valor:valor, categoria:cat, data:new Date().toLocaleDateString()};
-  db.ref("dados/"+uid).push(item);
+  if(!valor) return alert("Digite um valor!");
+  db.ref("dados/"+uid).push({tipo:"gasto",valor:dataNumber(valor),categoria:cat,data:new Date().toLocaleDateString()});
   document.getElementById("gastoValor").value="";
 }
 
-function deletar(key){
-  if(!uid) return;
-  db.ref("dados/"+uid+"/"+key).remove();
+function deletar(key){if(!uid) return; db.ref("dados/"+uid+"/"+key).remove();}
+
+function atualizarGrafico(){
+  const ctx=document.getElementById("grafico");
+  let categorias={};
+  dados.forEach(d=>{if(d.tipo==="gasto"){categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor;}});
+  if(grafico) grafico.destroy();
+  grafico=new Chart(ctx,{type:'pie',data:{labels:Object.keys(categorias),datasets:[{data:Object.values(categorias),backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
 }
 
-// --- GRÁFICO ---
-function atualizarGrafico(){
-  let categorias={};
-  dados.forEach(d=>{
-    if(d.tipo==="gasto"){
-      categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor;
-    }
-  });
-  const ctx=document.getElementById("grafico");
-  if(grafico) grafico.destroy();
-  grafico=new Chart(ctx,{
-    type:'pie',
-    data:{ labels:Object.keys(categorias), datasets:[{data:Object.values(categorias), backgroundColor:['#f87171','#34d399','#60a5fa','#fbbf24','#a78bfa']] } ],
-  }});
-}
+function dataNumber(v){return Number(v.toFixed(2));}
+
 </script>
 </body>
 </html>
