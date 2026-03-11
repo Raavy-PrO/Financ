@@ -10,6 +10,11 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- Firebase compat (funciona no WebView) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <style>
 
 :root{
@@ -225,11 +230,7 @@ Saldo
 
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script>
 
 const firebaseConfig = {
 apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
@@ -242,33 +243,42 @@ appId: "1:1087217649656:web:712786d04ec1f3be33380d",
 measurementId: "G-CGX6KB57FG"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
 
 let dados=[]
 let grafico
 let usuarioUID=null
 
-window.registrar=function(){
+
+function registrar(){
 
 let email=document.getElementById("usuario").value
 let senha=document.getElementById("senha").value
 
-createUserWithEmailAndPassword(auth,email,senha)
-.then(()=>alert("Conta criada"))
+auth.createUserWithEmailAndPassword(email,senha)
+
+.then(()=>{
+
+alert("Conta criada")
+
+})
+
 .catch(e=>alert(e.message))
 
 }
 
-window.login=function(){
+
+function login(){
 
 let email=document.getElementById("usuario").value
 let senha=document.getElementById("senha").value
 
-signInWithEmailAndPassword(auth,email,senha)
+auth.signInWithEmailAndPassword(email,senha)
 
-.then((user)=>{
+.then(user=>{
 
 usuarioUID=user.user.uid
 
@@ -278,24 +288,29 @@ document.getElementById("app").classList.remove("hidden")
 carregarDados()
 
 })
+
 .catch(()=>alert("Login inválido"))
 
 }
 
-window.logout=function(){
 
-signOut(auth)
+function logout(){
+
+auth.signOut()
+
 location.reload()
 
 }
 
-window.tema=function(){
+
+function tema(){
 
 document.body.classList.toggle("dark")
 
 }
 
-window.outroCampo=function(){
+
+function outroCampo(){
 
 let cat=document.getElementById("categoria").value
 
@@ -307,7 +322,8 @@ document.getElementById("outro").classList.add("hidden")
 
 }
 
-window.addReceita=function(){
+
+function addReceita(){
 
 let valor=Number(document.getElementById("receitaValor").value)
 
@@ -321,7 +337,8 @@ salvar()
 
 }
 
-window.addGasto=function(){
+
+function addGasto(){
 
 let valor=Number(document.getElementById("gastoValor").value)
 
@@ -342,17 +359,19 @@ salvar()
 
 }
 
+
 function salvar(){
 
-push(ref(db,"usuarios/"+usuarioUID+"/dados"),dados[dados.length-1])
+db.ref("usuarios/"+usuarioUID+"/dados").push(dados[dados.length-1])
 
 }
 
+
 function carregarDados(){
 
-const dbRef=ref(db,"usuarios/"+usuarioUID+"/dados")
+db.ref("usuarios/"+usuarioUID+"/dados")
 
-onValue(dbRef,(snapshot)=>{
+.on("value",(snapshot)=>{
 
 dados=[]
 
@@ -367,6 +386,7 @@ atualizar()
 })
 
 }
+
 
 function atualizar(){
 
@@ -393,6 +413,7 @@ categorias[d.categoria]+=d.valor
 
 let li=document.createElement("li")
 li.innerHTML=`${d.data} ${d.tipo} R$${d.valor}`
+
 lista.appendChild(li)
 
 })
@@ -404,6 +425,7 @@ document.getElementById("totalGasto").innerText="R$"+gasto
 desenharGrafico(categorias)
 
 }
+
 
 function desenharGrafico(cat){
 
