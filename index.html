@@ -35,19 +35,23 @@
 
 <div id="app" class="container hidden">
 
-  <div class="topbar">
+ <div class="topbar">
+  <!-- Botão de tema como ícone circular -->
+  <button id="temaBtn" class="iconBtn" onclick="tema()">
+    <i class="fas fa-moon"></i>
+  </button>
 
-    <button id="temaBtn" onclick="tema()"><i class="fas fa-moon"></i></button>
-
-    <div class="perfil">
-      <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
-      <div class="infoPerfil">
-        <span id="emailUser" class="email"></span>
-        <i class="fas fa-sign-out-alt" onclick="logout()" title="Sair"></i>
-      </div>
+  <!-- Balão de perfil -->
+  <div class="perfil">
+    <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
+    <div class="infoPerfil">
+      <span id="emailUser" class="email"></span>
+      <button class="iconBtn" onclick="logout()" title="Sair">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
     </div>
-
   </div>
+ </div>
 
   <div class="card">
     Saldo
