@@ -17,6 +17,10 @@
 /* ============================
    GERAL
 ============================ */
+*{
+  box-sizing:border-box;
+}
+
 body{
   font-family:Arial,sans-serif;
   margin:0;
@@ -30,6 +34,9 @@ body{
   color:white;
 }
 
+/* ============================
+   CONTAINER
+============================ */
 .container{
   max-width:420px;
   margin:auto;
@@ -51,6 +58,7 @@ body{
   padding:30px;
   border-radius:14px;
   width:100%;
+  max-width:350px;
   box-shadow:0 10px 30px rgba(0,0,0,0.1);
   text-align:center;
   transition:0.3s;
@@ -155,6 +163,10 @@ body{
 .email{
   font-size:14px;
   opacity:0.9;
+  max-width:120px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 /* ============================
@@ -292,7 +304,6 @@ li{
 <div id="app" class="container hidden">
 
 <div class="topbar">
-
   <button class="iconBtn" onclick="tema()" title="Tema">
     <i class="fas fa-moon"></i>
   </button>
@@ -306,7 +317,6 @@ li{
       </button>
     </div>
   </div>
-
 </div>
 
 <div class="dashboard">
@@ -368,122 +378,125 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-let uid=null
-let dados=[]
-let grafico=null
+let uid=null;
+let dados=[];
+let grafico=null;
 
-if(localStorage.getItem("tema")=="dark") document.body.classList.add("dark")
+if(localStorage.getItem("tema")=="dark") document.body.classList.add("dark");
 
 auth.onAuthStateChanged(user=>{
   if(user){
-    uid=user.uid
-    document.getElementById("emailUser").innerText=user.email
-    document.getElementById("login").classList.add("hidden")
-    document.getElementById("app").classList.remove("hidden")
-    carregar()
+    uid=user.uid;
+    document.getElementById("emailUser").innerText=user.email;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    carregar();
   }
 })
 
 function registrar(){
-  let email=document.getElementById("email").value
-  let senha=document.getElementById("senha").value
+  let email=document.getElementById("email").value;
+  let senha=document.getElementById("senha").value;
+  if(!email||!senha){alert("Digite email e senha");return;}
   auth.createUserWithEmailAndPassword(email,senha)
   .then(()=>alert("Conta criada"))
-  .catch(e=>alert(e.message))
+  .catch(e=>alert(e.message));
 }
 
 function login(){
-  let email=document.getElementById("email").value
-  let senha=document.getElementById("senha").value
+  let email=document.getElementById("email").value;
+  let senha=document.getElementById("senha").value;
+  if(!email||!senha){alert("Digite email e senha");return;}
   auth.signInWithEmailAndPassword(email,senha)
-  .catch(()=>alert("Erro no login"))
+  .catch(()=>alert("Erro no login"));
 }
 
 function logout(){
-  auth.signOut()
-  location.reload()
+  auth.signOut();
+  location.reload();
 }
 
 function tema(){
-  document.body.classList.toggle("dark")
-  if(document.body.classList.contains("dark")) localStorage.setItem("tema","dark")
-  else localStorage.setItem("tema","light")
+  document.body.classList.toggle("dark");
+  if(document.body.classList.contains("dark")) localStorage.setItem("tema","dark");
+  else localStorage.setItem("tema","light");
 }
 
 function addReceita(){
-  if(!uid) return
-  let valor=Number(document.getElementById("receitaValor").value)
-  if(!valor) return alert("Digite um valor")
-  let item={tipo:"receita",valor:valor,data:new Date().toLocaleDateString()}
-  db.ref("dados/"+uid).push(item)
+  if(!uid) return;
+  let valor=Number(document.getElementById("receitaValor").value);
+  if(!valor) return alert("Digite um valor");
+  let item={tipo:"receita",valor:valor,data:new Date().toLocaleDateString()};
+  db.ref("dados/"+uid).push(item);
 }
 
 function addGasto(){
-  if(!uid) return
-  let valor=Number(document.getElementById("gastoValor").value)
-  let cat=document.getElementById("categoria").value
-  if(!valor) return alert("Digite um valor")
-  let item={tipo:"gasto",valor:valor,categoria:cat,data:new Date().toLocaleDateString()}
-  db.ref("dados/"+uid).push(item)
+  if(!uid) return;
+  let valor=Number(document.getElementById("gastoValor").value);
+  let cat=document.getElementById("categoria").value;
+  if(!valor) return alert("Digite um valor");
+  let item={tipo:"gasto",valor:valor,categoria:cat,data:new Date().toLocaleDateString()};
+  db.ref("dados/"+uid).push(item);
 }
 
 function deletar(id){
-  db.ref("dados/"+uid+"/"+id).remove()
+  db.ref("dados/"+uid+"/"+id).remove();
 }
 
 function carregar(){
   db.ref("dados/"+uid).on("value",snap=>{
-    dados=[]
-    let lista=document.getElementById("lista")
-    lista.innerHTML=""
-    let totalR=0, totalG=0
+    dados=[];
+    let lista=document.getElementById("lista");
+    lista.innerHTML="";
+    let totalR=0,totalG=0;
     snap.forEach(i=>{
-      let d=i.val()
-      let key=i.key
-      dados.push(d)
-      let li=document.createElement("li")
+      let d=i.val();
+      let key=i.key;
+      dados.push(d);
+      let li=document.createElement("li");
       li.innerHTML=`<span>${d.data} R$${d.valor}</span>
-                    <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`
-      lista.appendChild(li)
-      if(d.tipo==="receita") totalR+=d.valor
-      else totalG+=d.valor
-    })
-    document.getElementById("totalReceita").innerText="R$"+totalR.toFixed(2)
-    document.getElementById("totalGasto").innerText="R$"+totalG.toFixed(2)
-    atualizar()
-  })
+                     <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
+      lista.appendChild(li);
+      if(d.tipo==="receita") totalR+=d.valor;
+      else totalG+=d.valor;
+    });
+    document.getElementById("totalReceita").innerText="R$"+totalR.toFixed(2);
+    document.getElementById("totalGasto").innerText="R$"+totalG.toFixed(2);
+    atualizar();
+  });
 }
 
 function atualizar(){
-  let saldo=0
-  let categorias={}
+  let saldo=0;
+  let categorias={};
   dados.forEach(d=>{
-    if(d.tipo==="receita") saldo+=d.valor
+    if(d.tipo==="receita") saldo+=d.valor;
     else{
-      saldo-=d.valor
-      if(!categorias[d.categoria]) categorias[d.categoria]=0
-      categorias[d.categoria]+=d.valor
+      saldo-=d.valor;
+      if(!categorias[d.categoria]) categorias[d.categoria]=0;
+      categorias[d.categoria]+=d.valor;
     }
-  })
-  document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
-  graficoFunc(categorias)
+  });
+  document.getElementById("saldo").innerText="R$"+saldo.toFixed(2);
+  graficoFunc(categorias);
 }
 
 function graficoFunc(cat){
-  let ctx=document.getElementById("grafico")
-  if(grafico) grafico.destroy()
+  let ctx=document.getElementById("grafico");
+  if(grafico) grafico.destroy();
   grafico=new Chart(ctx,{
     type:"doughnut",
     data:{
       labels:Object.keys(cat),
-      datasets:[{data:Object.values(cat),backgroundColor:['#3b82f6','#ef4444','#10b981','#facc15','#8b5cf6']}]
+      datasets:[{data:Object.values(cat),
+                 backgroundColor:['#3b82f6','#ef4444','#10b981','#facc15','#8b5cf6']}]
     },
     options:{
       animation:{animateScale:true},
       responsive:true,
       plugins:{legend:{position:'bottom'}}
     }
-  })
+  });
 }
 </script>
 </body>
