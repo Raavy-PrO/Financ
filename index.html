@@ -4,7 +4,6 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>Finanças</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,13 +13,7 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <style>
-/* ============================
-   GERAL
-============================ */
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box;}
 body{
   font-family:Arial,sans-serif;
   margin:0;
@@ -28,265 +21,57 @@ body{
   color:#1f2937;
   transition:0.3s;
 }
-
-.dark{
-  background:#0f172a;
-  color:white;
-}
-
-/* ============================
-   CONTAINER
-============================ */
-.container{
-  max-width:420px;
-  margin:auto;
-  padding:20px;
-}
-
-/* ============================
-   LOGIN
-============================ */
-.loginBox{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
+.dark{background:#0f172a;color:white;}
+.container{max-width:420px;margin:auto;padding:20px;}
+.loginBox{height:100vh;display:flex;justify-content:center;align-items:center;}
 .loginCard{
-  background:white;
-  padding:30px;
-  border-radius:14px;
-  width:100%;
-  max-width:350px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
-  text-align:center;
-  transition:0.3s;
+  background:white;padding:30px;border-radius:14px;width:100%;max-width:350px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;transition:0.3s;
 }
+.dark .loginCard{background:#1e293b;}
+.loginCard h2{margin-bottom:20px;}
+.loginCard input{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:1px solid #ccc;}
+.dark input{background:#0f172a;color:white;border:1px solid #444;}
+.loginCard button{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:none;cursor:pointer;background:#3b82f6;color:white;transition:0.3s;}
+.loginCard button:hover{background:#2563eb;}
 
-.dark .loginCard{
-  background:#1e293b;
-}
+/* TOPBAR */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;}
+.iconBtn{background:#3b82f6;color:white;border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:0.3s;}
+.iconBtn:hover{background:#2563eb;}
+.perfil{display:flex;align-items:center;background:#e0e0e0;border-radius:30px;padding:5px 10px;gap:10px;}
+.dark .perfil{background:#1e293b;}
+.fotoPerfil{width:40px;height:40px;border-radius:50%;}
+.infoPerfil{display:flex;align-items:center;gap:10px;}
+.email{font-size:14px;opacity:0.9;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-.loginCard h2{
-  margin-bottom:20px;
-}
+/* CARDS */
+.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
+.box{background:white;padding:15px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.08);transition:transform 0.3s, box-shadow 0.3s;}
+.dark .box{background:#1e293b;}
+.box:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.15);}
+.verde{color:#10b981;}
+.vermelho{color:#ef4444;}
+.saldo{font-size:28px;font-weight:bold;}
+.card{background:white;padding:20px;border-radius:12px;margin-top:15px;transition:0.3s;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+.dark .card{background:#1e293b;}
+.card input,.card select{width:100%;padding:12px;margin-top:8px;border-radius:8px;border:1px solid #ccc;}
+.dark .card input,.dark .card select{background:#0f172a;color:white;border:1px solid #444;}
+.card button{background:#3b82f6;color:white;border:none;cursor:pointer;transition:0.3s;}
+.card button:hover{background:#2563eb;}
+ul{list-style:none;padding:0;}
+li{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.del{background:transparent;border:none;cursor:pointer;color:#ef4444;font-size:16px;}
 
-.loginCard input{
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border-radius:8px;
-  font-size:14px;
-  border:1px solid #ccc;
-}
-
-.dark input{
-  background:#0f172a;
-  color:white;
-  border:1px solid #444;
-}
-
-.loginCard button{
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border-radius:8px;
-  font-size:14px;
-  border:none;
-  cursor:pointer;
-  background:#3b82f6;
-  color:white;
-  transition:0.3s;
-}
-
-.loginCard button:hover{
-  background:#2563eb;
-}
-
-/* ============================
-   TOPBAR
-============================ */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px;
-  gap:10px;
-}
-
-.iconBtn{
-  background:#3b82f6;
-  color:white;
-  border:none;
-  border-radius:50%;
-  width:40px;
-  height:40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-size:16px;
-  transition:0.3s;
-}
-
-.iconBtn:hover{
-  background:#2563eb;
-}
-
-/* Balão de perfil */
-.perfil{
-  display:flex;
-  align-items:center;
-  background:#e0e0e0;
-  border-radius:30px;
-  padding:5px 10px;
-  gap:10px;
-}
-
-.dark .perfil{
-  background:#1e293b;
-}
-
-.fotoPerfil{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-}
-
-.infoPerfil{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.email{
-  font-size:14px;
-  opacity:0.9;
-  max-width:120px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-/* ============================
-   CARDS DASHBOARD
-============================ */
-.dashboard{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-.box{
-  background:white;
-  padding:15px;
-  border-radius:12px;
-  text-align:center;
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
-  transition:transform 0.3s, box-shadow 0.3s;
-}
-
-.dark .box{
-  background:#1e293b;
-}
-
-.box:hover{
-  transform:translateY(-4px);
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-}
-
-.verde{color:#10b981}
-.vermelho{color:#ef4444}
-
-.saldo{
-  font-size:28px;
-  font-weight:bold;
-}
-
-/* ============================
-   CARD PADRÃO
-============================ */
-.card{
-  background:white;
-  padding:20px;
-  border-radius:12px;
-  margin-top:15px;
-  transition:0.3s;
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
-}
-
-.dark .card{
-  background:#1e293b;
-}
-
-.card input, .card select{
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-.dark .card input, .dark .card select{
-  background:#0f172a;
-  color:white;
-  border:1px solid #444;
-}
-
-.card button{
-  background:#3b82f6;
-  color:white;
-  border:none;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-.card button:hover{
-  background:#2563eb;
-}
-
-ul{
-  list-style:none;
-  padding:0;
-}
-
-li{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:6px;
-}
-
-.del{
-  background:transparent;
-  border:none;
-  cursor:pointer;
-  color:#ef4444;
-  font-size:16px;
-}
-
-/* ============================
-   RESPONSIVO
-============================ */
+/* RESPONSIVO */
 @media (max-width: 480px){
-  .container{
-    padding:10px;
-  }
-  .card{
-    padding:15px;
-  }
-  .topbar{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-  .dashboard{
-    grid-template-columns:1fr;
-  }
+  .container{padding:10px;}
+  .card{padding:15px;}
+  .topbar{flex-direction:column;align-items:flex-start;}
+  .dashboard{grid-template-columns:1fr;}
 }
 </style>
-
+</head>
 <body>
 
 <!-- LOGIN -->
@@ -301,20 +86,15 @@ li{
 </div>
 
 <!-- APP -->
-<div id="app" class="container hidden">
+<div id="app" class="container hidden" style="display:none;">
 
 <div class="topbar">
-  <button class="iconBtn" onclick="tema()" title="Tema">
-    <i class="fas fa-moon"></i>
-  </button>
-
+  <button class="iconBtn" onclick="tema()" title="Tema"><i class="fas fa-moon"></i> Tema</button>
   <div class="perfil">
     <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
     <div class="infoPerfil">
       <span id="emailUser" class="email"></span>
-      <button class="iconBtn" onclick="logout()" title="Sair">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
+      <button class="iconBtn" onclick="logout()" title="Sair"><i class="fas fa-sign-out-alt"></i> Sair</button>
     </div>
   </div>
 </div>
@@ -382,17 +162,19 @@ let uid=null;
 let dados=[];
 let grafico=null;
 
+// manter tema
 if(localStorage.getItem("tema")=="dark") document.body.classList.add("dark");
 
+// verificar login
 auth.onAuthStateChanged(user=>{
   if(user){
     uid=user.uid;
     document.getElementById("emailUser").innerText=user.email;
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
     carregar();
   }
-})
+});
 
 function registrar(){
   let email=document.getElementById("email").value;
