@@ -110,12 +110,10 @@ Saldo
 <input id="gastoValor" type="number">
 
 <select id="categoria">
-
 <option>Comida</option>
 <option>Transporte</option>
 <option>Casa</option>
 <option>Lazer</option>
-
 </select>
 
 <button onclick="addGasto()">Adicionar</button>
@@ -123,15 +121,12 @@ Saldo
 </div>
 
 <div class="card">
-
 <canvas id="grafico"></canvas>
-
 </div>
 
 <div class="card">
 
 <h3>Histórico</h3>
-
 <ul id="lista"></ul>
 
 </div>
@@ -139,7 +134,6 @@ Saldo
 <button onclick="logout()">Sair</button>
 
 </div>
-
 
 <script>
 
@@ -160,7 +154,24 @@ const db = firebase.database();
 
 let uid=null
 let dados=[]
-let grafico
+let grafico=null
+
+
+auth.onAuthStateChanged(user=>{
+
+if(user){
+
+uid=user.uid
+
+document.getElementById("login").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
+
+carregar()
+
+}
+
+})
+
 
 function registrar(){
 
@@ -168,11 +179,13 @@ let email=document.getElementById("email").value
 let senha=document.getElementById("senha").value
 
 auth.createUserWithEmailAndPassword(email,senha)
+
 .then(()=>alert("Conta criada"))
 
 .catch(e=>alert(e.message))
 
 }
+
 
 function login(){
 
@@ -181,20 +194,10 @@ let senha=document.getElementById("senha").value
 
 auth.signInWithEmailAndPassword(email,senha)
 
-.then(user=>{
-
-uid=user.user.uid
-
-document.getElementById("login").classList.add("hidden")
-document.getElementById("app").classList.remove("hidden")
-
-carregar()
-
-})
-
 .catch(()=>alert("Erro no login"))
 
 }
+
 
 function logout(){
 
@@ -204,9 +207,14 @@ location.reload()
 
 }
 
+
 function addReceita(){
 
+if(!uid) return alert("Faça login")
+
 let valor=Number(document.getElementById("receitaValor").value)
+
+if(!valor) return alert("Digite um valor")
 
 let item={
 tipo:"receita",
@@ -218,11 +226,15 @@ db.ref("dados/"+uid).push(item)
 
 }
 
+
 function addGasto(){
 
-let valor=Number(document.getElementById("gastoValor").value)
+if(!uid) return alert("Faça login")
 
+let valor=Number(document.getElementById("gastoValor").value)
 let cat=document.getElementById("categoria").value
+
+if(!valor) return alert("Digite um valor")
 
 let item={
 tipo:"gasto",
@@ -234,6 +246,7 @@ data:new Date().toLocaleDateString()
 db.ref("dados/"+uid).push(item)
 
 }
+
 
 function carregar(){
 
@@ -253,6 +266,7 @@ atualizar()
 
 }
 
+
 function atualizar(){
 
 let saldo=0
@@ -266,9 +280,11 @@ dados.forEach(d=>{
 if(d.tipo==="receita"){
 saldo+=d.valor
 }else{
+
 saldo-=d.valor
 
-if(!categorias[d.categoria])categorias[d.categoria]=0
+if(!categorias[d.categoria]) categorias[d.categoria]=0
+
 categorias[d.categoria]+=d.valor
 
 }
@@ -281,23 +297,26 @@ lista.appendChild(li)
 
 })
 
-document.getElementById("saldo").innerText="R$"+saldo
+document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
 
 graficoFunc(categorias)
 
 }
 
+
 function graficoFunc(cat){
 
 let ctx=document.getElementById("grafico")
 
-if(grafico)grafico.destroy()
+if(grafico) grafico.destroy()
 
 grafico=new Chart(ctx,{
 type:"pie",
 data:{
 labels:Object.keys(cat),
-datasets:[{data:Object.values(cat)}]
+datasets:[{
+data:Object.values(cat)
+}]
 }
 })
 
