@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
@@ -10,28 +9,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 
-:root{
---bg:#f4f6fb;
---card:#ffffff;
---text:#1f2937;
---primary:#3b82f6;
---danger:#ef4444;
---success:#10b981;
-}
-
-.dark{
---bg:#0f172a;
---card:#1e293b;
---text:#e5e7eb;
-}
-
 body{
+font-family:Arial;
 margin:0;
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
+background:#f5f5f5;
 }
 
 .container{
@@ -41,11 +28,10 @@ padding:20px;
 }
 
 .card{
-background:var(--card);
-padding:18px;
-border-radius:14px;
-margin-top:14px;
-box-shadow:0 6px 20px rgba(0,0,0,0.08);
+background:white;
+padding:20px;
+border-radius:12px;
+margin-top:15px;
 }
 
 input,select,button{
@@ -53,54 +39,17 @@ width:100%;
 padding:12px;
 margin-top:8px;
 border-radius:8px;
-border:1px solid #ddd;
-font-size:14px;
+border:1px solid #ccc;
 }
 
 button{
-background:var(--primary);
+background:#3b82f6;
 color:white;
 border:none;
-cursor:pointer;
 }
-
-.logout{
-background:#64748b;
-}
-
-.gasto{
-background:var(--danger);
-}
-
-.saldo{
-font-size:32px;
-font-weight:bold;
-}
-
-.dashboard{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.box{
-background:var(--card);
-padding:15px;
-border-radius:10px;
-text-align:center;
-}
-
-.verde{color:var(--success)}
-.vermelho{color:var(--danger)}
 
 .hidden{
 display:none;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
 }
 
 ul{
@@ -111,8 +60,7 @@ padding:0;
 li{
 display:flex;
 justify-content:space-between;
-margin-top:6px;
-font-size:14px;
+margin-top:5px;
 }
 
 </style>
@@ -125,7 +73,7 @@ font-size:14px;
 
 <h2>Login</h2>
 
-<input id="usuario" placeholder="Email">
+<input id="email" placeholder="Email">
 <input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
@@ -136,45 +84,18 @@ font-size:14px;
 
 <div id="app" class="container hidden">
 
-<div class="topbar">
-
 <h2>Dashboard</h2>
-
-<div>
-<button onclick="tema()">🌙</button>
-<button class="logout" onclick="logout()">Sair</button>
-</div>
-
-</div>
-
-
-<div class="dashboard">
-
-<div class="box">
-Receitas
-<div id="totalReceita" class="verde">R$0</div>
-</div>
-
-<div class="box">
-Gastos
-<div id="totalGasto" class="vermelho">R$0</div>
-</div>
-
-</div>
-
 
 <div class="card">
 
 Saldo
-
-<div id="saldo" class="saldo">R$0</div>
+<h1 id="saldo">R$0</h1>
 
 </div>
 
-
 <div class="card">
 
-<h3>Adicionar Receita</h3>
+<h3>Receita</h3>
 
 <input id="receitaValor" type="number">
 
@@ -182,38 +103,30 @@ Saldo
 
 </div>
 
-
 <div class="card">
 
-<h3>Adicionar Gasto</h3>
+<h3>Gasto</h3>
 
 <input id="gastoValor" type="number">
 
-<select id="categoria" onchange="outroCampo()">
+<select id="categoria">
 
 <option>Comida</option>
 <option>Transporte</option>
 <option>Casa</option>
 <option>Lazer</option>
-<option>Outros</option>
 
 </select>
 
-<input id="outro" class="hidden" placeholder="Digite categoria">
-
-<button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
+<button onclick="addGasto()">Adicionar</button>
 
 </div>
 
-
 <div class="card">
-
-<h3>Gráfico</h3>
 
 <canvas id="grafico"></canvas>
 
 </div>
-
 
 <div class="card">
 
@@ -223,13 +136,12 @@ Saldo
 
 </div>
 
+<button onclick="logout()">Sair</button>
+
 </div>
 
-<script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+<script>
 
 const firebaseConfig = {
 apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
@@ -238,127 +150,100 @@ databaseURL: "https://deliciacity-df6cf-default-rtdb.firebaseio.com",
 projectId: "deliciacity-df6cf",
 storageBucket: "deliciacity-df6cf.appspot.com",
 messagingSenderId: "1087217649656",
-appId: "1:1087217649656:web:712786d04ec1f3be33380d",
-measurementId: "G-CGX6KB57FG"
+appId: "1:1087217649656:web:712786d04ec1f3be33380d"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+firebase.initializeApp(firebaseConfig);
 
+const auth = firebase.auth();
+const db = firebase.database();
+
+let uid=null
 let dados=[]
 let grafico
-let usuarioUID=null
 
-window.registrar=function(){
+function registrar(){
 
-let email=document.getElementById("usuario").value
+let email=document.getElementById("email").value
 let senha=document.getElementById("senha").value
 
-createUserWithEmailAndPassword(auth,email,senha)
+auth.createUserWithEmailAndPassword(email,senha)
 .then(()=>alert("Conta criada"))
+
 .catch(e=>alert(e.message))
 
 }
 
-window.login=function(){
+function login(){
 
-let email=document.getElementById("usuario").value
+let email=document.getElementById("email").value
 let senha=document.getElementById("senha").value
 
-signInWithEmailAndPassword(auth,email,senha)
+auth.signInWithEmailAndPassword(email,senha)
 
-.then((user)=>{
+.then(user=>{
 
-usuarioUID=user.user.uid
+uid=user.user.uid
 
 document.getElementById("login").classList.add("hidden")
 document.getElementById("app").classList.remove("hidden")
 
-carregarDados()
+carregar()
 
 })
-.catch(()=>alert("Login inválido"))
+
+.catch(()=>alert("Erro no login"))
 
 }
 
-window.logout=function(){
+function logout(){
 
-signOut(auth)
+auth.signOut()
+
 location.reload()
 
 }
 
-window.tema=function(){
-
-document.body.classList.toggle("dark")
-
-}
-
-window.outroCampo=function(){
-
-let cat=document.getElementById("categoria").value
-
-if(cat==="Outros"){
-document.getElementById("outro").classList.remove("hidden")
-}else{
-document.getElementById("outro").classList.add("hidden")
-}
-
-}
-
-window.addReceita=function(){
+function addReceita(){
 
 let valor=Number(document.getElementById("receitaValor").value)
 
-dados.push({
+let item={
 tipo:"receita",
 valor:valor,
 data:new Date().toLocaleDateString()
-})
+}
 
-salvar()
+db.ref("dados/"+uid).push(item)
 
 }
 
-window.addGasto=function(){
+function addGasto(){
 
 let valor=Number(document.getElementById("gastoValor").value)
 
 let cat=document.getElementById("categoria").value
 
-if(cat==="Outros"){
-cat=document.getElementById("outro").value
-}
-
-dados.push({
+let item={
 tipo:"gasto",
 valor:valor,
 categoria:cat,
 data:new Date().toLocaleDateString()
-})
+}
 
-salvar()
+db.ref("dados/"+uid).push(item)
 
 }
 
-function salvar(){
+function carregar(){
 
-push(ref(db,"usuarios/"+usuarioUID+"/dados"),dados[dados.length-1])
-
-}
-
-function carregarDados(){
-
-const dbRef=ref(db,"usuarios/"+usuarioUID+"/dados")
-
-onValue(dbRef,(snapshot)=>{
+db.ref("dados/"+uid).on("value",snap=>{
 
 dados=[]
 
-snapshot.forEach(child=>{
+snap.forEach(i=>{
 
-dados.push(child.val())
+dados.push(i.val())
 
 })
 
@@ -371,48 +256,45 @@ atualizar()
 function atualizar(){
 
 let saldo=0
-let receita=0
-let gasto=0
 let categorias={}
-
 let lista=document.getElementById("lista")
+
 lista.innerHTML=""
 
 dados.forEach(d=>{
 
 if(d.tipo==="receita"){
 saldo+=d.valor
-receita+=d.valor
 }else{
 saldo-=d.valor
-gasto+=d.valor
 
 if(!categorias[d.categoria])categorias[d.categoria]=0
 categorias[d.categoria]+=d.valor
+
 }
 
 let li=document.createElement("li")
-li.innerHTML=`${d.data} ${d.tipo} R$${d.valor}`
+
+li.innerHTML=d.data+" R$"+d.valor
+
 lista.appendChild(li)
 
 })
 
-document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
-document.getElementById("totalReceita").innerText="R$"+receita
-document.getElementById("totalGasto").innerText="R$"+gasto
+document.getElementById("saldo").innerText="R$"+saldo
 
-desenharGrafico(categorias)
+graficoFunc(categorias)
 
 }
 
-function desenharGrafico(cat){
+function graficoFunc(cat){
 
 let ctx=document.getElementById("grafico")
 
 if(grafico)grafico.destroy()
 
 grafico=new Chart(ctx,{
-type:"doughnut",
+type:"pie",
 data:{
 labels:Object.keys(cat),
 datasets:[{data:Object.values(cat)}]
