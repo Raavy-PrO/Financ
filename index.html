@@ -4,91 +4,435 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Finanças</title>
 
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<!-- Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-LQ1/L3vJkMk2ZJxZf3qCIRkpZlTpXKXgQMF6nRr+zMxWZkYVv/m1LJ7K+Tv4zD2hRZyZ0WQxf4YIYzGjk5JvZw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f5f5f5;
+transition:0.3s;
+}
+
+.dark{
+background:#0f172a;
+color:white;
+}
+
+.container{
+max-width:420px;
+margin:auto;
+padding:20px;
+}
+
+.loginBox{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.loginCard{
+background:white;
+padding:30px;
+border-radius:14px;
+width:100%;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+.dark .loginCard{
+background:#1e293b;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-top:15px;
+}
+
+.dark .card{
+background:#1e293b;
+}
+
+input,select,button{
+width:100%;
+padding:12px;
+margin-top:8px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+.dark input,.dark select{
+background:#0f172a;
+color:white;
+border:1px solid #444;
+}
+
+button{
+background:#3b82f6;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+.hidden{
+display:none;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:10px;
+}
+
+.email{
+font-size:14px;
+opacity:0.8;
+}
+
+ul{
+list-style:none;
+padding:0;
+}
+
+li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:6px;
+}
+
+.del{
+background:#ef4444;
+padding:6px 10px;
+border-radius:6px;
+font-size:12px;
+}
+
+</style>
 
 </head>
+
 <body>
 
 <div id="login" class="loginBox">
-  <div class="loginCard">
-    <h2>Controle Financeiro</h2>
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <button onclick="registrar()">Criar conta</button>
-  </div>
+
+<div class="loginCard">
+
+<h2>Controle Financeiro</h2>
+
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+<button onclick="registrar()">Criar conta</button>
+
 </div>
+
+</div>
+
 
 <div id="app" class="container hidden">
 
- <div class="topbar">
-  <!-- Botão de tema como ícone circular -->
-  <button id="temaBtn" class="iconBtn" onclick="tema()">
-    <i class="fas fa-moon"></i>
-  </button>
+<div class="topbar">
 
-  <!-- Balão de perfil -->
-  <div class="perfil">
-    <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
-    <div class="infoPerfil">
-      <span id="emailUser" class="email"></span>
-      <button class="iconBtn" onclick="logout()" title="Sair">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
-  </div>
- </div>
+<div>
 
-  <div class="card">
-    Saldo
-    <h1 id="saldo">R$0</h1>
-  </div>
-
-  <div class="card">
-    <h3>Receita</h3>
-    <input id="receitaValor" type="number">
-    <button onclick="addReceita()">Adicionar</button>
-  </div>
-
-  <div class="card">
-    <h3>Gasto</h3>
-    <input id="gastoValor" type="number">
-    <select id="categoria">
-      <option>Comida</option>
-      <option>Transporte</option>
-      <option>Casa</option>
-      <option>Lazer</option>
-    </select>
-    <button onclick="addGasto()">Adicionar</button>
-  </div>
-
-  <div class="card">
-    <canvas id="grafico"></canvas>
-  </div>
-
-  <div class="card">
-    <h3>Extrato</h3>
-    <ul id="lista"></ul>
-  </div>
+<div id="emailUser" class="email"></div>
 
 </div>
 
-<!-- JS -->
-<script src="app.js"></script>
+<div>
+
+<button onclick="tema()">Tema</button>
+<button onclick="logout()">Sair</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+Saldo
+<h1 id="saldo">R$0</h1>
+
+</div>
+
+
+<div class="card">
+
+<h3>Receita</h3>
+
+<input id="receitaValor" type="number">
+
+<button onclick="addReceita()">Adicionar</button>
+
+</div>
+
+
+<div class="card">
+
+<h3>Gasto</h3>
+
+<input id="gastoValor" type="number">
+
+<select id="categoria">
+<option>Comida</option>
+<option>Transporte</option>
+<option>Casa</option>
+<option>Lazer</option>
+</select>
+
+<button onclick="addGasto()">Adicionar</button>
+
+</div>
+
+
+<div class="card">
+
+<canvas id="grafico"></canvas>
+
+</div>
+
+
+<div class="card">
+
+<h3>Extrato</h3>
+
+<ul id="lista"></ul>
+
+</div>
+
+</div>
+
+
+<script>
+
+const firebaseConfig = {
+apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
+authDomain: "deliciacity-df6cf.firebaseapp.com",
+databaseURL: "https://deliciacity-df6cf-default-rtdb.firebaseio.com",
+projectId: "deliciacity-df6cf",
+storageBucket: "deliciacity-df6cf.appspot.com",
+messagingSenderId: "1087217649656",
+appId: "1:1087217649656:web:712786d04ec1f3be33380d"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+let uid=null
+let dados=[]
+let grafico=null
+
+
+if(localStorage.getItem("tema")=="dark"){
+document.body.classList.add("dark")
+}
+
+
+auth.onAuthStateChanged(user=>{
+
+if(user){
+
+uid=user.uid
+
+document.getElementById("emailUser").innerText=user.email
+
+document.getElementById("login").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
+
+carregar()
+
+}
+
+})
+
+
+function registrar(){
+
+let email=document.getElementById("email").value
+let senha=document.getElementById("senha").value
+
+auth.createUserWithEmailAndPassword(email,senha)
+.then(()=>alert("Conta criada"))
+.catch(e=>alert(e.message))
+
+}
+
+
+function login(){
+
+let email=document.getElementById("email").value
+let senha=document.getElementById("senha").value
+
+auth.signInWithEmailAndPassword(email,senha)
+.catch(()=>alert("Erro no login"))
+
+}
+
+
+function logout(){
+
+auth.signOut()
+location.reload()
+
+}
+
+
+function tema(){
+
+document.body.classList.toggle("dark")
+
+if(document.body.classList.contains("dark")){
+localStorage.setItem("tema","dark")
+}else{
+localStorage.setItem("tema","light")
+}
+
+}
+
+
+function addReceita(){
+
+if(!uid) return
+
+let valor=Number(document.getElementById("receitaValor").value)
+
+if(!valor) return alert("Digite um valor")
+
+let item={
+tipo:"receita",
+valor:valor,
+data:new Date().toLocaleDateString()
+}
+
+db.ref("dados/"+uid).push(item)
+
+}
+
+
+function addGasto(){
+
+if(!uid) return
+
+let valor=Number(document.getElementById("gastoValor").value)
+let cat=document.getElementById("categoria").value
+
+if(!valor) return alert("Digite um valor")
+
+let item={
+tipo:"gasto",
+valor:valor,
+categoria:cat,
+data:new Date().toLocaleDateString()
+}
+
+db.ref("dados/"+uid).push(item)
+
+}
+
+
+function deletar(id){
+
+db.ref("dados/"+uid+"/"+id).remove()
+
+}
+
+
+function carregar(){
+
+db.ref("dados/"+uid).on("value",snap=>{
+
+dados=[]
+
+let lista=document.getElementById("lista")
+lista.innerHTML=""
+
+snap.forEach(i=>{
+
+let d=i.val()
+let key=i.key
+
+dados.push(d)
+
+let li=document.createElement("li")
+
+li.innerHTML=`
+<span>${d.data} R$${d.valor}</span>
+<button class="del" onclick="deletar('${key}')">Apagar</button>
+`
+
+lista.appendChild(li)
+
+})
+
+atualizar()
+
+})
+
+}
+
+
+function atualizar(){
+
+let saldo=0
+let categorias={}
+
+dados.forEach(d=>{
+
+if(d.tipo==="receita"){
+saldo+=d.valor
+}else{
+
+saldo-=d.valor
+
+if(!categorias[d.categoria])categorias[d.categoria]=0
+categorias[d.categoria]+=d.valor
+
+}
+
+})
+
+document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
+
+graficoFunc(categorias)
+
+}
+
+
+function graficoFunc(cat){
+
+let ctx=document.getElementById("grafico")
+
+if(grafico) grafico.destroy()
+
+grafico=new Chart(ctx,{
+type:"pie",
+data:{
+labels:Object.keys(cat),
+datasets:[{
+data:Object.values(cat)
+}]
+}
+})
+
+}
+
+</script>
 
 </body>
 </html>
