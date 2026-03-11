@@ -1,5 +1,8 @@
+/* ============================
+   GERAL
+============================ */
 body{
-  font-family:Arial;
+  font-family:Arial, sans-serif;
   margin:0;
   background:#f5f5f5;
   transition:0.3s;
@@ -10,12 +13,18 @@ body{
   color:white;
 }
 
+/* ============================
+   CONTAINER
+============================ */
 .container{
   max-width:420px;
   margin:auto;
   padding:20px;
 }
 
+/* ============================
+   LOGIN
+============================ */
 .loginBox{
   height:100vh;
   display:flex;
@@ -29,24 +38,50 @@ body{
   border-radius:14px;
   width:100%;
   box-shadow:0 10px 30px rgba(0,0,0,0.1);
+  text-align:center;
 }
 
 .dark .loginCard{
   background:#1e293b;
 }
 
+.loginCard input, .loginCard button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border-radius:8px;
+  font-size:14px;
+  border:1px solid #ccc;
+}
+
+.loginCard button{
+  background:#3b82f6;
+  color:white;
+  border:none;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.loginCard button:hover{
+  background:#2563eb;
+}
+
+/* ============================
+   CARD
+============================ */
 .card{
   background:white;
   padding:20px;
   border-radius:12px;
   margin-top:15px;
+  transition:0.3s;
 }
 
 .dark .card{
   background:#1e293b;
 }
 
-input,select,button{
+.card input, .card select, .card button{
   width:100%;
   padding:12px;
   margin-top:8px;
@@ -54,36 +89,65 @@ input,select,button{
   border:1px solid #ccc;
 }
 
-.dark input,.dark select{
+.dark .card input, .dark .card select{
   background:#0f172a;
   color:white;
   border:1px solid #444;
 }
 
-button{
+.card button{
   background:#3b82f6;
   color:white;
   border:none;
   cursor:pointer;
+  transition:0.3s;
 }
 
-.hidden{
-  display:none;
+.card button:hover{
+  background:#2563eb;
 }
 
+/* ============================
+   TOPBAR
+============================ */
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
   margin-bottom:15px;
+  gap:10px;
 }
 
+/* Botão ícone circular (tema, logout) */
+.iconBtn{
+  background:#3b82f6;
+  color:white;
+  border:none;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:16px;
+  transition:0.3s;
+}
+
+.iconBtn:hover{
+  background:#2563eb;
+}
+
+/* ============================
+   PERFIL
+============================ */
 .perfil{
   display:flex;
   align-items:center;
   background:#e0e0e0;
   border-radius:30px;
   padding:5px 10px;
+  gap:10px;
 }
 
 .dark .perfil{
@@ -94,7 +158,6 @@ button{
   width:40px;
   height:40px;
   border-radius:50%;
-  margin-right:10px;
 }
 
 .infoPerfil{
@@ -108,6 +171,9 @@ button{
   opacity:0.9;
 }
 
+/* ============================
+   EXTRATO / LISTA
+============================ */
 ul{
   list-style:none;
   padding:0;
@@ -126,4 +192,21 @@ li{
   cursor:pointer;
   color:#ef4444;
   font-size:16px;
+}
+
+/* ============================
+   RESPONSIVO
+============================ */
+@media (max-width: 480px){
+  .container{
+    padding:10px;
+  }
+  .card{
+    padding:15px;
+  }
+  .topbar{
+    flex-direction: column;
+    align-items: flex-start;
+    gap:5px;
+  }
 }
