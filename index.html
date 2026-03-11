@@ -32,37 +32,29 @@ margin:0;
 font-family:system-ui;
 background:var(--bg);
 color:var(--text);
-transition:0.3s;
 }
 
 .container{
-max-width:480px;
+max-width:420px;
 margin:auto;
 padding:20px;
 }
 
 .card{
 background:var(--card);
-padding:20px;
-border-radius:16px;
-margin-top:16px;
-box-shadow:0 8px 25px rgba(0,0,0,0.08);
-animation:fadeUp .4s ease;
-transition:.2s;
-}
-
-.card:hover{
-transform:translateY(-2px);
+padding:18px;
+border-radius:14px;
+margin-top:14px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
 input,select,button{
 width:100%;
 padding:12px;
-margin-top:10px;
-border-radius:10px;
+margin-top:8px;
+border-radius:8px;
 border:1px solid #ddd;
 font-size:14px;
-box-sizing:border-box;
 }
 
 button{
@@ -81,24 +73,21 @@ background:var(--danger);
 }
 
 .saldo{
-font-size:34px;
+font-size:32px;
 font-weight:bold;
-margin-top:10px;
 }
 
 .dashboard{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:12px;
-margin-top:10px;
+gap:10px;
 }
 
 .box{
 background:var(--card);
-padding:18px;
-border-radius:12px;
+padding:15px;
+border-radius:10px;
 text-align:center;
-font-weight:500;
 }
 
 .verde{color:var(--success)}
@@ -117,50 +106,13 @@ align-items:center;
 ul{
 list-style:none;
 padding:0;
-margin:0;
 }
 
 li{
 display:flex;
 justify-content:space-between;
-align-items:center;
-background:rgba(0,0,0,0.04);
-padding:10px;
-border-radius:8px;
-margin-top:8px;
+margin-top:6px;
 font-size:14px;
-}
-
-.dark li{
-background:rgba(255,255,255,0.05);
-}
-
-.data{
-opacity:.6;
-font-size:12px;
-}
-
-@keyframes fadeUp{
-from{
-opacity:0;
-transform:translateY(10px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-@media(min-width:700px){
-
-.container{
-max-width:700px;
-}
-
-.dashboard{
-grid-template-columns:1fr 1fr;
-}
-
 }
 
 </style>
@@ -173,7 +125,7 @@ grid-template-columns:1fr 1fr;
 
 <h2>Login</h2>
 
-<input id="usuario" placeholder="Usuário">
+<input id="usuario" placeholder="Email">
 <input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
@@ -256,7 +208,7 @@ Saldo
 
 <div class="card">
 
-<h3>Gráfico de Gastos</h3>
+<h3>Gráfico</h3>
 
 <canvas id="grafico"></canvas>
 
@@ -265,7 +217,7 @@ Saldo
 
 <div class="card">
 
-<h3>Extrato</h3>
+<h3>Histórico</h3>
 
 <ul id="lista"></ul>
 
@@ -273,136 +225,117 @@ Saldo
 
 </div>
 
+<script type="module">
 
-<script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-let dados = JSON.parse(localStorage.getItem("dados")) || []
+const firebaseConfig = {
+apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
+authDomain: "deliciacity-df6cf.firebaseapp.com",
+databaseURL: "https://deliciacity-df6cf-default-rtdb.firebaseio.com",
+projectId: "deliciacity-df6cf",
+storageBucket: "deliciacity-df6cf.appspot.com",
+messagingSenderId: "1087217649656",
+appId: "1:1087217649656:web:712786d04ec1f3be33380d",
+measurementId: "G-CGX6KB57FG"
+};
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let dados=[]
 let grafico
+let usuarioUID=null
 
-function registrar(){
+window.registrar=function(){
 
-let usuario=document.getElementById("usuario").value
+let email=document.getElementById("usuario").value
 let senha=document.getElementById("senha").value
 
-if(!usuario || !senha){
-
-alert("Digite usuário e senha")
-return
-
-}
-
-localStorage.setItem("user_"+usuario,senha)
-
-alert("Conta criada com sucesso")
+createUserWithEmailAndPassword(auth,email,senha)
+.then(()=>alert("Conta criada"))
+.catch(e=>alert(e.message))
 
 }
 
-function login(){
+window.login=function(){
 
-let usuario=document.getElementById("usuario").value
+let email=document.getElementById("usuario").value
 let senha=document.getElementById("senha").value
 
-let senhaSalva=localStorage.getItem("user_"+usuario)
+signInWithEmailAndPassword(auth,email,senha)
 
-if(!senhaSalva){
+.then((user)=>{
 
-alert("Usuário não existe")
-return
-
-}
-
-if(senhaSalva!==senha){
-
-alert("Senha incorreta")
-return
-
-}
-
-localStorage.setItem("logado",usuario)
+usuarioUID=user.user.uid
 
 document.getElementById("login").classList.add("hidden")
 document.getElementById("app").classList.remove("hidden")
 
-atualizar()
+carregarDados()
+
+})
+.catch(()=>alert("Login inválido"))
 
 }
 
-if(localStorage.getItem("logado")){
+window.logout=function(){
 
-document.getElementById("login").classList.add("hidden")
-document.getElementById("app").classList.remove("hidden")
-
-}
-
-function logout(){
-
-localStorage.removeItem("logado")
+signOut(auth)
 location.reload()
 
 }
 
-function tema(){
+window.tema=function(){
 
 document.body.classList.toggle("dark")
 
 }
 
-function outroCampo(){
+window.outroCampo=function(){
 
 let cat=document.getElementById("categoria").value
 
 if(cat==="Outros"){
-
 document.getElementById("outro").classList.remove("hidden")
-
 }else{
-
 document.getElementById("outro").classList.add("hidden")
-
 }
 
 }
 
-function addReceita(){
+window.addReceita=function(){
 
 let valor=Number(document.getElementById("receitaValor").value)
 
-if(!valor) return
-
-dados.unshift({
-
+dados.push({
 tipo:"receita",
 valor:valor,
 data:new Date().toLocaleDateString()
-
 })
 
 salvar()
 
 }
 
-function addGasto(){
+window.addGasto=function(){
 
 let valor=Number(document.getElementById("gastoValor").value)
-
-if(!valor) return
 
 let cat=document.getElementById("categoria").value
 
 if(cat==="Outros"){
-
 cat=document.getElementById("outro").value
-
 }
 
-dados.unshift({
-
+dados.push({
 tipo:"gasto",
 valor:valor,
 categoria:cat,
 data:new Date().toLocaleDateString()
-
 })
 
 salvar()
@@ -411,9 +344,27 @@ salvar()
 
 function salvar(){
 
-localStorage.setItem("dados",JSON.stringify(dados))
+push(ref(db,"usuarios/"+usuarioUID+"/dados"),dados[dados.length-1])
+
+}
+
+function carregarDados(){
+
+const dbRef=ref(db,"usuarios/"+usuarioUID+"/dados")
+
+onValue(dbRef,(snapshot)=>{
+
+dados=[]
+
+snapshot.forEach(child=>{
+
+dados.push(child.val())
+
+})
 
 atualizar()
+
+})
 
 }
 
@@ -422,11 +373,9 @@ function atualizar(){
 let saldo=0
 let receita=0
 let gasto=0
-
 let categorias={}
 
 let lista=document.getElementById("lista")
-
 lista.innerHTML=""
 
 dados.forEach(d=>{
@@ -443,14 +392,7 @@ categorias[d.categoria]+=d.valor
 }
 
 let li=document.createElement("li")
-
-li.innerHTML=`
-<div>
-<div>${d.tipo==="receita"?"Receita":"Gasto"} - R$${d.valor}</div>
-<div class="data">${d.data}</div>
-</div>
-`
-
+li.innerHTML=`${d.data} ${d.tipo} R$${d.valor}`
 lista.appendChild(li)
 
 })
@@ -474,25 +416,12 @@ type:"doughnut",
 data:{
 labels:Object.keys(cat),
 datasets:[{data:Object.values(cat)}]
-},
-options:{
-animation:{
-duration:900
-},
-plugins:{
-legend:{
-position:"bottom"
-}
-}
 }
 })
 
 }
 
-atualizar()
-
 </script>
 
 </body>
-
 </html>
