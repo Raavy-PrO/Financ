@@ -21,6 +21,7 @@ let grafico=null;
 // mantém tema salvo
 if(localStorage.getItem("tema")=="dark"){
   document.body.classList.add("dark")
+  document.getElementById("temaBtn").innerHTML='<i class="fas fa-sun"></i>';
 }
 
 // Listener de autenticação
@@ -57,13 +58,16 @@ function logout(){
   location.reload();
 }
 
-// Tema claro/escuro
+// Tema claro/escuro com ícone
 function tema(){
   document.body.classList.toggle("dark");
+  let btn=document.getElementById("temaBtn");
   if(document.body.classList.contains("dark")){
-    localStorage.setItem("tema","dark")
+    localStorage.setItem("tema","dark");
+    btn.innerHTML='<i class="fas fa-sun"></i>';
   }else{
-    localStorage.setItem("tema","light")
+    localStorage.setItem("tema","light");
+    btn.innerHTML='<i class="fas fa-moon"></i>';
   }
 }
 
@@ -102,7 +106,8 @@ function carregar(){
       let key=i.key;
       dados.push(d);
       let li=document.createElement("li");
-      li.innerHTML=`<span>${d.data} R$${d.valor}</span><button class="del" onclick="deletar('${key}')">Apagar</button>`;
+      li.innerHTML=`<span>${d.data} R$${d.valor}</span>
+                     <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
       lista.appendChild(li);
     });
     atualizar();
