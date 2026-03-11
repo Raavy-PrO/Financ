@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Finanças</title>
+<title>App Financeiro</title>
+
+<link rel="stylesheet" href="style.css">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -13,123 +16,13 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<style>
-
-:root{
---bg:#f4f6fb;
---card:#ffffff;
---text:#1f2937;
---primary:#3b82f6;
---danger:#ef4444;
---success:#10b981;
-}
-
-.dark{
---bg:#0f172a;
---card:#1e293b;
---text:#e5e7eb;
-}
-
-body{
-margin:0;
-font-family:system-ui;
-background:var(--bg);
-color:var(--text);
-}
-
-.container{
-max-width:450px;
-margin:auto;
-padding:20px;
-}
-
-.card{
-background:var(--card);
-padding:18px;
-border-radius:14px;
-margin-top:14px;
-box-shadow:0 6px 20px rgba(0,0,0,0.08);
-}
-
-input,select,button{
-width:100%;
-padding:12px;
-margin-top:8px;
-border-radius:8px;
-border:1px solid #ddd;
-font-size:14px;
-}
-
-button{
-background:var(--primary);
-color:white;
-border:none;
-cursor:pointer;
-}
-
-.logout{
-background:#64748b;
-}
-
-.gasto{
-background:var(--danger);
-}
-
-.saldo{
-font-size:32px;
-font-weight:bold;
-}
-
-.dashboard{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.box{
-background:var(--card);
-padding:15px;
-border-radius:10px;
-text-align:center;
-}
-
-.verde{color:var(--success)}
-.vermelho{color:var(--danger)}
-
-.hidden{
-display:none;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.theme{
-background:black;
-color:white;
-}
-
-ul{
-list-style:none;
-padding:0;
-}
-
-li{
-display:flex;
-justify-content:space-between;
-margin-top:6px;
-font-size:14px;
-}
-
-</style>
-
 </head>
 
 <body>
 
-<div id="login" class="container">
+<!-- TELA DE LOGIN -->
+
+<div id="login">
 
 <h2>Login</h2>
 
@@ -137,67 +30,85 @@ font-size:14px;
 <input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
-<button onclick="registrar()">Criar Conta</button>
+<button onclick="registrar()">Criar conta</button>
 
 </div>
 
 
-<div id="app" class="container hidden">
+<!-- APP PRINCIPAL -->
 
-<div class="topbar">
+<div id="app" class="hidden">
+
+<header>
 
 <h2>Dashboard</h2>
 
 <div>
-<button class="theme" onclick="tema()">🌙</button>
-<button class="logout" onclick="logout()">Sair</button>
-</div>
+
+<button onclick="trocarTema()">🌗 Tema</button>
+<button onclick="logout()">Logout</button>
 
 </div>
 
+</header>
 
-<div class="dashboard">
+
+<!-- DASHBOARD -->
+
+<section class="dashboard">
 
 <div class="box">
+
 Receitas
-<div id="totalReceita" class="verde">R$0</div>
+
+<span id="receitas">R$0</span>
+
 </div>
 
 <div class="box">
+
 Gastos
-<div id="totalGasto" class="vermelho">R$0</div>
-</div>
+
+<span id="gastos">R$0</span>
 
 </div>
 
+</section>
 
-<div class="card">
+
+<!-- SALDO -->
+
+<section class="saldo">
 
 Saldo
 
-<div id="saldo" class="saldo">R$0</div>
+<h1 id="saldo">R$0</h1>
 
-</div>
+</section>
 
 
-<div class="card">
+<!-- ADICIONAR RECEITA -->
+
+<section class="card">
 
 <h3>Adicionar Receita</h3>
 
-<input id="receitaValor" type="number" placeholder="Valor">
+<input id="valorReceita" type="number">
 
 <button onclick="addReceita()">Adicionar</button>
 
-</div>
+</section>
 
 
-<div class="card">
+<!-- ADICIONAR GASTO -->
+
+<section class="card">
 
 <h3>Adicionar Gasto</h3>
 
-<input id="gastoValor" type="number" placeholder="Valor">
+<input id="valorGasto" type="number">
 
-<select id="categoria" onchange="outroCampo()">
+<select id="categoria" onchange="mostrarOutro()">
 
 <option>Comida</option>
 <option>Transporte</option>
@@ -207,249 +118,34 @@ Saldo
 
 </select>
 
-<input id="outro" class="hidden" placeholder="Digite categoria">
+<input id="categoriaOutro" class="hidden" placeholder="Digite categoria">
 
-<button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
+<button onclick="addGasto()">Adicionar gasto</button>
 
-</div>
+</section>
 
 
-<div class="card">
+<!-- GRÁFICO -->
 
-<h3>Gráfico</h3>
+<section class="card">
 
 <canvas id="grafico"></canvas>
 
+</section>
+
+
+<!-- HISTÓRICO -->
+
+<section class="card">
+
+<ul id="historico"></ul>
+
+</section>
+
 </div>
 
-
-<div class="card">
-
-<h3>Histórico</h3>
-
-<ul id="lista"></ul>
-
-</div>
-
-</div>
-
-
-<script>
-
-const firebaseConfig={
-apiKey:"SUA_API",
-authDomain:"SEUAPP.firebaseapp.com",
-projectId:"SEUAPP"
-}
-
-firebase.initializeApp(firebaseConfig)
-
-const auth=firebase.auth()
-const db=firebase.firestore()
-
-let dados=[]
-let grafico
-
-function tema(){
-
-document.body.classList.toggle("dark")
-
-}
-
-function outroCampo(){
-
-let cat=document.getElementById("categoria").value
-
-if(cat==="Outros"){
-document.getElementById("outro").classList.remove("hidden")
-}else{
-document.getElementById("outro").classList.add("hidden")
-}
-
-}
-
-function registrar(){
-
-let email=emailInput()
-let senha=senhaInput()
-
-auth.createUserWithEmailAndPassword(email,senha)
-
-}
-
-function login(){
-
-let email=emailInput()
-let senha=senhaInput()
-
-auth.signInWithEmailAndPassword(email,senha)
-
-}
-
-function logout(){
-
-auth.signOut()
-
-}
-
-function emailInput(){
-return document.getElementById("email").value
-}
-
-function senhaInput(){
-return document.getElementById("senha").value
-}
-
-auth.onAuthStateChanged(user=>{
-
-if(user){
-
-document.getElementById("login").classList.add("hidden")
-document.getElementById("app").classList.remove("hidden")
-
-sincronizar(user.uid)
-
-}else{
-
-document.getElementById("login").classList.remove("hidden")
-document.getElementById("app").classList.add("hidden")
-
-}
-
-})
-
-function sincronizar(uid){
-
-db.collection("financas").doc(uid)
-.onSnapshot(doc=>{
-
-if(doc.exists){
-
-dados=doc.data().dados
-
-}else{
-
-dados=[]
-
-}
-
-atualizar()
-
-})
-
-}
-
-function salvar(uid){
-
-db.collection("financas").doc(uid).set({
-dados:dados
-})
-
-}
-
-function addReceita(){
-
-let valor=Number(document.getElementById("receitaValor").value)
-
-let user=auth.currentUser
-
-dados.push({
-
-tipo:"receita",
-valor:valor,
-data:new Date().toLocaleDateString()
-
-})
-
-salvar(user.uid)
-
-}
-
-function addGasto(){
-
-let valor=Number(document.getElementById("gastoValor").value)
-
-let cat=document.getElementById("categoria").value
-
-if(cat==="Outros"){
-
-cat=document.getElementById("outro").value
-
-}
-
-let user=auth.currentUser
-
-dados.push({
-
-tipo:"gasto",
-valor:valor,
-categoria:cat,
-data:new Date().toLocaleDateString()
-
-})
-
-salvar(user.uid)
-
-}
-
-function atualizar(){
-
-let saldo=0
-let receita=0
-let gasto=0
-
-let categorias={}
-
-let lista=document.getElementById("lista")
-
-lista.innerHTML=""
-
-dados.forEach(d=>{
-
-if(d.tipo==="receita"){
-saldo+=d.valor
-receita+=d.valor
-}else{
-saldo-=d.valor
-gasto+=d.valor
-
-if(!categorias[d.categoria])categorias[d.categoria]=0
-categorias[d.categoria]+=d.valor
-}
-
-let li=document.createElement("li")
-
-li.innerHTML=`${d.data} ${d.tipo} R$${d.valor}`
-
-lista.appendChild(li)
-
-})
-
-document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
-document.getElementById("totalReceita").innerText="R$"+receita
-document.getElementById("totalGasto").innerText="R$"+gasto
-
-desenharGrafico(categorias)
-
-}
-
-function desenharGrafico(cat){
-
-let ctx=document.getElementById("grafico")
-
-if(grafico)grafico.destroy()
-
-grafico=new Chart(ctx,{
-type:"doughnut",
-data:{
-labels:Object.keys(cat),
-datasets:[{data:Object.values(cat)}]
-}
-})
-
-}
-
-</script>
+<script src="app.js"></script>
 
 </body>
+
 </html>
