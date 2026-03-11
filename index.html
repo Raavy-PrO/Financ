@@ -228,14 +228,12 @@ li:last-child { border-bottom: none; }
 
 /* Footer */
 footer {
-  text-align: center;
-  font-size: 12px;
-  color: #9ca3af;
-  padding: 15px 0;
-  margin-top: 30px;
-  border-top: 1px solid #ccc;
+  text-align:center;
+  font-size:12px;
+  padding:10px;
+  color:#6b7280;
+  margin-top:20px;
 }
-.dark footer { color: #64748b; border-color: #334155; }
 
 /* Responsivo */
 @media (max-width: 480px) {
@@ -277,7 +275,7 @@ footer {
     </div>
   </div>
 
-  <!-- Resumo -->
+  <!-- Dashboard -->
   <div class="dashboard">
     <div class="box">
       <div>Saldo Atual</div>
@@ -327,12 +325,14 @@ footer {
   <!-- Extrato -->
   <div class="card">
     <h3>📜 Extrato Recente</h3>
-    <ul id="lista"></ul>
+    <div id="listaContainer">
+      <ul id="lista"></ul>
+    </div>
   </div>
 
   <!-- Footer -->
   <footer>
-    Finanças Pessoais - Versão 1.0.0
+    Finanças Pessoais v1.0.0 — Todos os direitos reservados
   </footer>
 </div>
 
@@ -347,23 +347,31 @@ const firebaseConfig = {
   messagingSenderId: "1087217649656",
   appId: "1:1087217649656:web:712786d04ec1f3be33380d"
 };
+
+// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Variáveis globais
-let uid=null,dados=[],grafico=null;
-const formatarMoeda = (v)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+// Variáveis Globais
+let uid = null;
+let dados = [];
+let grafico = null;
 
-// --- TEMA ---
+// Formatar moeda
+const formatarMoeda = (valor) => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(valor);
+
+// Tema
 if(localStorage.getItem("tema")==="dark") document.body.classList.add("dark");
 function tema(){
   document.body.classList.toggle("dark");
-  localStorage.setItem("tema",document.body.classList.contains("dark")?"dark":"light");
-  document.querySelector('.iconBtn[onclick="tema()"] i').className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
+  const isDark = document.body.classList.contains("dark");
+  localStorage.setItem("tema", isDark?"dark":"light");
+  const btn = document.querySelector('.iconBtn[onclick="tema()"] i');
+  btn.className = isDark?"fas fa-sun":"fas fa-moon";
 }
 
-// --- AUTENTICAÇÃO ---
+// Autenticação
 auth.onAuthStateChanged(user=>{
   if(user){
     uid=user.uid;
@@ -371,7 +379,7 @@ auth.onAuthStateChanged(user=>{
     document.getElementById("login").style.display="none";
     document.getElementById("app").style.display="block";
     carregarDados();
-  } else {
+  }else{
     document.getElementById("login").style.display="flex";
     document.getElementById("app").style.display="none";
   }
@@ -380,61 +388,66 @@ auth.onAuthStateChanged(user=>{
 function registrar(){
   const email=document.getElementById("email").value;
   const senha=document.getElementById("senha").value;
-  if(!email||!senha)return alert("Preencha email e senha!");
-  if(senha.length<6)return alert("Senha deve ter no mínimo 6 caracteres!");
+  if(!email||!senha) return alert("Preencha email e senha!");
+  if(senha.length<6) return alert("Senha deve ter no mínimo 6 caracteres!");
   const btn=document.getElementById("btnRegistrar");
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...';
-  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...'; btn.disabled=true;
   auth.createUserWithEmailAndPassword(email,senha)
-      .then(()=>{alert("Conta criada!");document.getElementById("email").value="";document.getElementById("senha").value="";})
-      .catch(e=>alert("Erro: "+e.message))
-      .finally(()=>{btn.innerHTML='Criar conta';btn.disabled=false;});
+  .then(()=>{ alert("Conta criada com sucesso!"); document.getElementById("email").value=""; document.getElementById("senha").value=""; })
+  .catch(e=>alert("Erro: "+e.message))
+  .finally(()=>{ btn.innerHTML='Criar conta'; btn.disabled=false; });
 }
 
 function login(){
   const email=document.getElementById("email").value;
   const senha=document.getElementById("senha").value;
-  if(!email||!senha)return alert("Preencha email e senha!");
+  if(!email||!senha) return alert("Preencha email e senha!");
   const btn=document.getElementById("btnLogin");
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...';
-  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...'; btn.disabled=true;
   auth.signInWithEmailAndPassword(email,senha)
-      .catch(e=>{alert("Erro: "+e.message);btn.innerHTML='Entrar';btn.disabled=false;});
+  .catch(e=>{ alert("Erro: "+e.message); btn.innerHTML='Entrar'; btn.disabled=false; });
 }
 
-function logout(){auth.signOut();location.reload();}
+function logout(){ auth.signOut(); location.reload(); }
 
 // --- DADOS ---
 function carregarDados(){
+  if(!uid) return;
   db.ref("dados/"+uid).on("value",snap=>{
-    dados=[];let lista=document.getElementById("lista");lista.innerHTML="";
-    let receitaTotal=0,gastoTotal=0;let categorias={};
+    dados=[]; const lista=document.getElementById("lista"); lista.innerHTML="";
     snap.forEach(i=>{
-      let d=i.val(),key=i.key;dados.push(d);
-      let li=document.createElement("li");
-      li.innerHTML=`<span>${d.data} R$${d.valor}</span>
-                    <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash-alt"></i></button>`;
+      const d=i.val(); const key=i.key; dados.push(d);
+      const li=document.createElement("li");
+      li.innerHTML=`<span>${d.data} ${formatarMoeda(d.valor)}</span>
+        <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash-alt"></i></button>`;
       lista.appendChild(li);
-      if(d.tipo==="receita") receitaTotal+=d.valor;
-      else { gastoTotal+=d.valor; categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor; }
     });
-    document.getElementById("saldo").innerText=formatarMoeda(receitaTotal-gastoTotal);
-    document.getElementById("totalReceita").innerText=formatarMoeda(receitaTotal);
-    document.getElementById("totalGasto").innerText=formatarMoeda(gastoTotal);
-    graficoFunc(categorias);
+    atualizarDashboard();
   });
 }
 
-function addReceita(){if(!uid)return;const valor=Number(document.getElementById("receitaValor").value);if(!valor)return alert("Digite um valor");db.ref("dados/"+uid).push({tipo:"receita",valor:valor,data:new Date().toLocaleDateString()});document.getElementById("receitaValor").value="";}
-function addGasto(){if(!uid)return;const valor=Number(document.getElementById("gastoValor").value);const cat=document.getElementById("categoria").value;if(!valor)return alert("Digite um valor");db.ref("dados/"+uid).push({tipo:"gasto",valor:valor,categoria:cat,data:new Date().toLocaleDateString()});document.getElementById("gastoValor").value="";}
-function deletar(id){db.ref("dados/"+uid+"/"+id).remove();}
+function addReceita(){ if(!uid) return; let valor=Number(document.getElementById("receitaValor").value); if(!valor) return alert("Digite um valor"); db.ref("dados/"+uid).push({tipo:"receita",valor,data:new Date().toLocaleDateString()}); document.getElementById("receitaValor").value=""; }
 
-function graficoFunc(cat){
+function addGasto(){ if(!uid) return; let valor=Number(document.getElementById("gastoValor").value); let cat=document.getElementById("categoria").value; if(!valor) return alert("Digite um valor"); db.ref("dados/"+uid).push({tipo:"gasto",valor,categoria:cat,data:new Date().toLocaleDateString()}); document.getElementById("gastoValor").value=""; }
+
+function deletar(id){ if(!uid) return; db.ref("dados/"+uid+"/"+id).remove(); }
+
+function atualizarDashboard(){
+  let saldo=0, receita=0, gasto=0, categorias={};
+  dados.forEach(d=>{
+    if(d.tipo==="receita"){ saldo+=d.valor; receita+=d.valor; } else { saldo-=d.valor; gasto+=d.valor; categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor; }
+  });
+  document.getElementById("saldo").innerText=formatarMoeda(saldo);
+  document.getElementById("totalReceita").innerText=formatarMoeda(receita);
+  document.getElementById("totalGasto").innerText=formatarMoeda(gasto);
+  desenharGrafico(categorias);
+}
+
+function desenharGrafico(cat){
   const ctx=document.getElementById("grafico");
   if(grafico) grafico.destroy();
-  grafico=new Chart(ctx,{type:"pie",data:{labels:Object.keys(cat),datasets:[{data:Object.values(cat),backgroundColor:['#10b981','#ef4444','#3b82f6','#f59e0b','#8b5cf6']}]},options:{responsive:true}});
+  grafico=new Chart(ctx,{type:"pie",data:{labels:Object.keys(cat),datasets:[{data:Object.values(cat)}]}});
 }
 </script>
-
 </body>
 </html>
