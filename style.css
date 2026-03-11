@@ -1,0 +1,104 @@
+body{
+  font-family:Arial;
+  margin:0;
+  background:#f5f5f5;
+  transition:0.3s;
+}
+
+.dark{
+  background:#0f172a;
+  color:white;
+}
+
+.container{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+
+.loginBox{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.loginCard{
+  background:white;
+  padding:30px;
+  border-radius:14px;
+  width:100%;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+.dark .loginCard{
+  background:#1e293b;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+.dark .card{
+  background:#1e293b;
+}
+
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.dark input,.dark select{
+  background:#0f172a;
+  color:white;
+  border:1px solid #444;
+}
+
+button{
+  background:#3b82f6;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+.hidden{
+  display:none;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.email{
+  font-size:14px;
+  opacity:0.8;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+}
+
+li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+}
+
+.del{
+  background:#ef4444;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
