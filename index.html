@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Finanças</title>
 
@@ -11,98 +13,131 @@
 <style>
 
 :root{
---bg:#0f172a;
---card:#1e293b;
---text:#ffffff;
---green:#22c55e;
---red:#ef4444;
+--bg:#f4f6fb;
+--card:#ffffff;
+--text:#1f2937;
+--primary:#3b82f6;
+--danger:#ef4444;
+--success:#10b981;
 }
 
-.light{
---bg:#f1f5f9;
---card:#ffffff;
---text:#111;
+.dark{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#e5e7eb;
 }
 
 body{
 margin:0;
-font-family:Arial;
+font-family:system-ui;
 background:var(--bg);
 color:var(--text);
+transition:0.3s;
 }
 
 .container{
 max-width:480px;
 margin:auto;
-padding:16px;
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-margin-bottom:15px;
-}
-
-button{
-border:none;
-padding:12px;
-border-radius:10px;
-cursor:pointer;
-}
-
-input{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:none;
-margin-top:10px;
-margin-bottom:10px;
+padding:20px;
 }
 
 .card{
 background:var(--card);
 padding:20px;
 border-radius:16px;
-margin-top:15px;
+margin-top:16px;
+box-shadow:0 8px 25px rgba(0,0,0,0.08);
 animation:fadeUp .4s ease;
 transition:.2s;
 }
 
 .card:hover{
-transform:translateY(-3px);
+transform:translateY(-2px);
 }
 
-.cards-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
+input,select,button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid #ddd;
+font-size:14px;
+box-sizing:border-box;
 }
 
-.saldo{
-font-size:30px;
-font-weight:bold;
+button{
+background:var(--primary);
+color:white;
+border:none;
+cursor:pointer;
 }
 
-.receita{
-color:var(--green);
+.logout{
+background:#64748b;
 }
 
 .gasto{
-color:var(--red);
+background:var(--danger);
 }
 
-#extrato{
-display:flex;
-flex-direction:column;
-gap:10px;
+.saldo{
+font-size:34px;
+font-weight:bold;
+margin-top:10px;
 }
 
-.item{
+.dashboard{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:10px;
+}
+
+.box{
+background:var(--card);
+padding:18px;
+border-radius:12px;
+text-align:center;
+font-weight:500;
+}
+
+.verde{color:var(--success)}
+.vermelho{color:var(--danger)}
+
+.hidden{
+display:none;
+}
+
+.topbar{
 display:flex;
 justify-content:space-between;
-background:rgba(255,255,255,0.05);
+align-items:center;
+}
+
+ul{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:rgba(0,0,0,0.04);
 padding:10px;
 border-radius:8px;
+margin-top:8px;
+font-size:14px;
+}
+
+.dark li{
+background:rgba(255,255,255,0.05);
+}
+
+.data{
+opacity:.6;
+font-size:12px;
 }
 
 @keyframes fadeUp{
@@ -122,214 +157,342 @@ transform:translateY(0);
 max-width:700px;
 }
 
+.dashboard{
+grid-template-columns:1fr 1fr;
+}
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div id="login" class="container">
+
+<h2>Login</h2>
+
+<input id="usuario" placeholder="Usuário">
+<input id="senha" type="password" placeholder="Senha">
+
+<button onclick="login()">Entrar</button>
+<button onclick="registrar()">Criar conta</button>
+
+</div>
+
+
+<div id="app" class="container hidden">
 
 <div class="topbar">
+
 <h2>Dashboard</h2>
 
 <div>
-<button onclick="toggleTheme()">🌙</button>
-<button onclick="logout()">Sair</button>
+<button onclick="tema()">🌙</button>
+<button class="logout" onclick="logout()">Sair</button>
 </div>
 
 </div>
 
-<div class="cards-grid">
+
+<div class="dashboard">
+
+<div class="box">
+Receitas
+<div id="totalReceita" class="verde">R$0</div>
+</div>
+
+<div class="box">
+Gastos
+<div id="totalGasto" class="vermelho">R$0</div>
+</div>
+
+</div>
+
 
 <div class="card">
-<h3>Receitas</h3>
-<p id="receitas" class="receita">R$0</p>
+
+Saldo
+
+<div id="saldo" class="saldo">R$0</div>
+
 </div>
+
 
 <div class="card">
-<h3>Gastos</h3>
-<p id="gastos" class="gasto">R$0</p>
-</div>
 
-</div>
-
-<div class="card">
-<h3>Saldo</h3>
-<p class="saldo" id="saldo">R$0</p>
-</div>
-
-<div class="card">
-<h3>Resumo</h3>
-<canvas id="grafico"></canvas>
-</div>
-
-<div class="card">
 <h3>Adicionar Receita</h3>
 
-<input id="valorReceita" placeholder="Valor">
+<input id="receitaValor" type="number">
 
 <button onclick="addReceita()">Adicionar</button>
 
 </div>
 
+
 <div class="card">
+
 <h3>Adicionar Gasto</h3>
 
-<input id="valorGasto" placeholder="Valor">
+<input id="gastoValor" type="number">
 
-<button onclick="addGasto()">Adicionar</button>
+<select id="categoria" onchange="outroCampo()">
+
+<option>Comida</option>
+<option>Transporte</option>
+<option>Casa</option>
+<option>Lazer</option>
+<option>Outros</option>
+
+</select>
+
+<input id="outro" class="hidden" placeholder="Digite categoria">
+
+<button class="gasto" onclick="addGasto()">Adicionar Gasto</button>
 
 </div>
+
 
 <div class="card">
+
+<h3>Gráfico de Gastos</h3>
+
+<canvas id="grafico"></canvas>
+
+</div>
+
+
+<div class="card">
+
 <h3>Extrato</h3>
 
-<div id="extrato"></div>
+<ul id="lista"></ul>
 
 </div>
 
 </div>
+
 
 <script>
 
-let receitas=0
-let gastos=0
-let historico=[]
+let dados = JSON.parse(localStorage.getItem("dados")) || []
 
-const ctx=document.getElementById("grafico")
+let grafico
 
-const chart=new Chart(ctx,{
-type:"doughnut",
-data:{
-labels:["Receitas","Gastos"],
-datasets:[{
-data:[0,0]
-}]
-},
-options:{
-responsive:true,
-animation:{
-duration:800
-}
-}
-})
+function registrar(){
 
-function atualizar(){
+let usuario=document.getElementById("usuario").value
+let senha=document.getElementById("senha").value
 
-document.getElementById("receitas").innerText="R$"+receitas
-document.getElementById("gastos").innerText="R$"+gastos
+if(!usuario || !senha){
 
-const saldo=receitas-gastos
-
-document.getElementById("saldo").innerText="R$"+saldo
-
-chart.data.datasets[0].data=[receitas,gastos]
-chart.update()
-
-localStorage.setItem("receitas",receitas)
-localStorage.setItem("gastos",gastos)
-localStorage.setItem("historico",JSON.stringify(historico))
+alert("Digite usuário e senha")
+return
 
 }
 
-function addReceita(){
+localStorage.setItem("user_"+usuario,senha)
 
-const valor=parseFloat(document.getElementById("valorReceita").value)
+alert("Conta criada com sucesso")
 
-if(!valor)return
+}
 
-receitas+=valor
+function login(){
 
-historico.unshift({
-tipo:"receita",
-valor:valor,
-data:new Date().toLocaleDateString()
-})
+let usuario=document.getElementById("usuario").value
+let senha=document.getElementById("senha").value
 
-renderExtrato()
+let senhaSalva=localStorage.getItem("user_"+usuario)
 
-document.getElementById("valorReceita").value=""
+if(!senhaSalva){
+
+alert("Usuário não existe")
+return
+
+}
+
+if(senhaSalva!==senha){
+
+alert("Senha incorreta")
+return
+
+}
+
+localStorage.setItem("logado",usuario)
+
+document.getElementById("login").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
 
 atualizar()
 
 }
 
-function addGasto(){
+if(localStorage.getItem("logado")){
 
-const valor=parseFloat(document.getElementById("valorGasto").value)
-
-if(!valor)return
-
-gastos+=valor
-
-historico.unshift({
-tipo:"gasto",
-valor:valor,
-data:new Date().toLocaleDateString()
-})
-
-renderExtrato()
-
-document.getElementById("valorGasto").value=""
-
-atualizar()
-
-}
-
-function renderExtrato(){
-
-const extrato=document.getElementById("extrato")
-
-extrato.innerHTML=""
-
-historico.forEach(item=>{
-
-const div=document.createElement("div")
-
-div.className="item"
-
-div.innerHTML=`
-<span>${item.data}</span>
-<b class="${item.tipo}">
-${item.tipo=="receita"?"+":"-"}R$${item.valor}
-</b>
-`
-
-extrato.appendChild(div)
-
-})
-
-}
-
-function toggleTheme(){
-
-document.body.classList.toggle("light")
+document.getElementById("login").classList.add("hidden")
+document.getElementById("app").classList.remove("hidden")
 
 }
 
 function logout(){
 
-alert("Logout realizado")
+localStorage.removeItem("logado")
+location.reload()
 
 }
 
-function carregar(){
+function tema(){
 
-receitas=parseFloat(localStorage.getItem("receitas"))||0
-gastos=parseFloat(localStorage.getItem("gastos"))||0
-historico=JSON.parse(localStorage.getItem("historico"))||[]
+document.body.classList.toggle("dark")
 
-renderExtrato()
+}
+
+function outroCampo(){
+
+let cat=document.getElementById("categoria").value
+
+if(cat==="Outros"){
+
+document.getElementById("outro").classList.remove("hidden")
+
+}else{
+
+document.getElementById("outro").classList.add("hidden")
+
+}
+
+}
+
+function addReceita(){
+
+let valor=Number(document.getElementById("receitaValor").value)
+
+if(!valor) return
+
+dados.unshift({
+
+tipo:"receita",
+valor:valor,
+data:new Date().toLocaleDateString()
+
+})
+
+salvar()
+
+}
+
+function addGasto(){
+
+let valor=Number(document.getElementById("gastoValor").value)
+
+if(!valor) return
+
+let cat=document.getElementById("categoria").value
+
+if(cat==="Outros"){
+
+cat=document.getElementById("outro").value
+
+}
+
+dados.unshift({
+
+tipo:"gasto",
+valor:valor,
+categoria:cat,
+data:new Date().toLocaleDateString()
+
+})
+
+salvar()
+
+}
+
+function salvar(){
+
+localStorage.setItem("dados",JSON.stringify(dados))
 
 atualizar()
 
 }
 
-carregar()
+function atualizar(){
+
+let saldo=0
+let receita=0
+let gasto=0
+
+let categorias={}
+
+let lista=document.getElementById("lista")
+
+lista.innerHTML=""
+
+dados.forEach(d=>{
+
+if(d.tipo==="receita"){
+saldo+=d.valor
+receita+=d.valor
+}else{
+saldo-=d.valor
+gasto+=d.valor
+
+if(!categorias[d.categoria])categorias[d.categoria]=0
+categorias[d.categoria]+=d.valor
+}
+
+let li=document.createElement("li")
+
+li.innerHTML=`
+<div>
+<div>${d.tipo==="receita"?"Receita":"Gasto"} - R$${d.valor}</div>
+<div class="data">${d.data}</div>
+</div>
+`
+
+lista.appendChild(li)
+
+})
+
+document.getElementById("saldo").innerText="R$"+saldo.toFixed(2)
+document.getElementById("totalReceita").innerText="R$"+receita
+document.getElementById("totalGasto").innerText="R$"+gasto
+
+desenharGrafico(categorias)
+
+}
+
+function desenharGrafico(cat){
+
+let ctx=document.getElementById("grafico")
+
+if(grafico)grafico.destroy()
+
+grafico=new Chart(ctx,{
+type:"doughnut",
+data:{
+labels:Object.keys(cat),
+datasets:[{data:Object.values(cat)}]
+},
+options:{
+animation:{
+duration:900
+},
+plugins:{
+legend:{
+position:"bottom"
+}
+}
+}
+})
+
+}
+
+atualizar()
 
 </script>
 
 </body>
+
 </html>
