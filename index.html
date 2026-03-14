@@ -5,252 +5,633 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Finanças Pessoais</title>
 
-<!-- Bibliotecas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <style>
-/* --- ESTILOS --- */
-*{box-sizing:border-box;}
-body{font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;margin:0;background:#f5f6fb;color:#1f2937;transition:0.3s;min-height:100vh;}
-.dark{background:#0f172a;color:#e2e8f0;}
-.hidden{display:none !important;}
-/* Login */
-.loginBox{height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
-.loginCard{background:white;padding:30px;border-radius:14px;width:100%;max-width:350px;box-shadow:0 10px 30px rgba(0,0,0,0.1);text-align:center;transition:0.3s;}
-.dark .loginCard{background:#1e293b;}
-.loginCard h2{margin-bottom:20px;color:#3b82f6;}
-.loginCard input{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:1px solid #ccc;outline:none;transition:0.3s;}
-.dark input{background:#0f172a;color:white;border:1px solid #444;}
-.loginCard input:focus{border-color:#3b82f6;}
-.loginCard button{width:100%;margin-top:10px;padding:12px;border-radius:8px;font-size:14px;border:none;cursor:pointer;background:#3b82f6;color:white;transition:0.3s;font-weight:600;}
-.loginCard button:hover{background:#2563eb;}
-.loginCard button:disabled{background:#9ca3af;cursor:not-allowed;}
-/* App */
-.container{max-width:420px;margin:auto;padding:20px;padding-bottom:80px;}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;gap:10px;}
-.iconBtn{background:#3b82f6;color:white;border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:0.3s;}
-.iconBtn:hover{background:#2563eb;}
-.perfil{display:flex;align-items:center;background:#e0e0e0;border-radius:30px;padding:5px 10px;gap:10px;}
-.dark .perfil{background:#1e293b;}
-.fotoPerfil{width:40px;height:40px;border-radius:50%;object-fit:cover;}
-.infoPerfil{display:flex;align-items:center;gap:10px;}
-.email{font-size:14px;opacity:0.9;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dashboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
-.box{background:white;padding:15px;border-radius:12px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.08);transition: transform 0.3s, box-shadow 0.3s;}
-.dark .box{background:#1e293b;}
-.box:hover{transform:translateY(-4px);box-shadow:0 8px 25px rgba(0,0,0,0.15);}
-.verde{color:#10b981;}
-.vermelho{color:#ef4444;}
-.saldo{font-size:28px;font-weight:bold;margin-top:5px;}
-.card{background:white;padding:20px;border-radius:12px;margin-top:15px;transition:0.3s;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
-.dark .card{background:#1e293b;}
-.card h3{margin-top:0;margin-bottom:15px;font-size:16px;}
-.card input,.card select{width:100%;padding:12px;margin-top:8px;border-radius:8px;border:1px solid #ccc;font-size:14px;}
-.dark .card input,.dark .card select{background:#0f172a;color:white;border:1px solid #444;}
-.card button{width:100%;margin-top:10px;padding:12px;border-radius:8px;border:none;cursor:pointer;background:#3b82f6;color:white;font-weight:bold;}
-.card button:hover{background:#2563eb;}
-ul{list-style:none;padding:0;margin:0;}
-li{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;}
-.dark li{border-bottom:1px solid #334155;}
-li:last-child{border-bottom:none;}
-.del{background:transparent;border:none;cursor:pointer;color:#ef4444;font-size:18px;padding:5px;transition:0.3s;}
-.del:hover{transform:scale(1.2);}
-@media(max-width:480px){.container{padding:10px;}.card{padding:15px;}.topbar{flex-direction:column;align-items:flex-start;}.dashboard{grid-template-columns:1fr;}.perfil{width:100%;justify-content:space-between;}}
+*{box-sizing:border-box;transition:background .3s,color .3s,border-color .3s}
+
+body{
+font-family:Segoe UI,'Helvetica Neue',sans-serif;
+margin:0;
+background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+min-height:100vh;
+color:#1f2937
+}
+
+/* ── DARK MODE ── */
+body.dark{
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+color:#e5e7eb
+}
+
+body.dark .loginCard,
+body.dark .box,
+body.dark .card{
+background:linear-gradient(135deg,#1f2937,#111827);
+border-color:rgba(255,255,255,.08);
+color:#e5e7eb
+}
+
+body.dark .box h3{color:#9ca3af}
+body.dark .card h3{color:#e5e7eb}
+
+body.dark .loginCard input,
+body.dark .card input,
+body.dark .card select{
+background:#111827;
+border-color:#374151;
+color:#e5e7eb
+}
+
+body.dark .loginCard input:focus,
+body.dark .card input:focus,
+body.dark .card select:focus{
+border-color:#6366f1;
+box-shadow:0 0 0 3px rgba(99,102,241,.15)
+}
+
+body.dark li{border-bottom-color:#374151}
+body.dark li:hover{background:#1f2937}
+body.dark span{color:#e5e7eb}
+
+body.dark #emailUser{color:#e5e7eb}
+
+/* ── TEMA TOGGLE BUTTON ── */
+.btn-tema{
+position:fixed;
+top:15px;
+right:15px;
+z-index:999;
+background:rgba(255,255,255,.2);
+border:2px solid rgba(255,255,255,.4);
+backdrop-filter:blur(10px);
+color:white;
+font-size:20px;
+width:46px;
+height:46px;
+border-radius:50%;
+cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 4px 15px rgba(0,0,0,.2);
+transition:all .3s ease
+}
+
+.btn-tema:hover{
+transform:scale(1.1) rotate(20deg);
+box-shadow:0 8px 25px rgba(0,0,0,.3)
+}
+
+.hidden{display:none}
+
+.loginBox{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px
+}
+
+.loginCard{
+background:white;
+padding:40px;
+border-radius:20px;
+width:100%;
+max-width:380px;
+text-align:center;
+box-shadow:0 20px 40px rgba(0,0,0,.15);
+backdrop-filter:blur(10px)
+}
+
+.loginCard h2{
+margin:0 0 30px 0;
+color:#1f2937;
+font-size:28px
+}
+
+body.dark .loginCard h2{color:#e5e7eb}
+
+.loginCard input{
+width:100%;
+margin-top:15px;
+padding:15px;
+border-radius:12px;
+border:2px solid #e5e7eb;
+font-size:16px;
+transition:all .3s ease;
+background:#f9fafb
+}
+
+.loginCard input:focus{
+outline:none;
+border-color:#3b82f6;
+box-shadow:0 0 0 3px rgba(59,130,246,.1)
+}
+
+.loginCard button{
+width:100%;
+margin-top:15px;
+padding:15px;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:all .3s ease;
+letter-spacing:.5px
+}
+
+.btn-primary{
+background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+color:white;
+box-shadow:0 4px 15px rgba(59,130,246,.3)
+}
+
+.btn-primary:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 25px rgba(59,130,246,.4)
+}
+
+.btn-success{
+background:linear-gradient(135deg,#10b981,#059669);
+color:white;
+box-shadow:0 4px 15px rgba(16,185,129,.3)
+}
+
+.btn-success:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 25px rgba(16,185,129,.4)
+}
+
+.container{
+max-width:450px;
+margin:auto;
+padding:20px;
+padding-bottom:100px
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-bottom:25px
+}
+
+.box{
+background:linear-gradient(135deg,white,#f8fafc);
+padding:25px 20px;
+border-radius:16px;
+text-align:center;
+box-shadow:0 8px 25px rgba(0,0,0,.08);
+border:1px solid rgba(255,255,255,.5);
+backdrop-filter:blur(10px);
+transition:all .3s ease
+}
+
+.box:hover{
+transform:translateY(-5px);
+box-shadow:0 15px 35px rgba(0,0,0,.12)
+}
+
+.box h3{
+margin:0 0 15px 0;
+font-size:14px;
+color:#6b7280;
+font-weight:500;
+text-transform:uppercase;
+letter-spacing:.5px
+}
+
+.box .valor{
+font-size:28px;
+font-weight:700;
+margin:0;
+line-height:1.2
+}
+
+.verde{color:#10b981}
+.vermelho{color:#ef4444}
+.ciano{color:#06b6d4}
+
+.card{
+background:linear-gradient(135deg,white,#f8fafc);
+padding:25px;
+border-radius:16px;
+margin-top:20px;
+box-shadow:0 8px 25px rgba(0,0,0,.08);
+border:1px solid rgba(255,255,255,.5);
+backdrop-filter:blur(10px)
+}
+
+.card h3{
+margin:0 0 20px 0;
+color:#1f2937;
+font-size:20px;
+display:flex;
+align-items:center;
+gap:10px
+}
+
+.card input,.card select{
+width:100%;
+padding:15px;
+margin-top:12px;
+border-radius:12px;
+border:2px solid #e5e7eb;
+font-size:16px;
+background:#f9fafb;
+transition:all .3s ease
+}
+
+.card input:focus,.card select:focus{
+outline:none;
+border-color:#3b82f6;
+box-shadow:0 0 0 3px rgba(59,130,246,.1)
+}
+
+.card button{
+width:100%;
+margin-top:15px;
+padding:15px;
+background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+color:white;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:all .3s ease;
+letter-spacing:.5px
+}
+
+.card button:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 25px rgba(59,130,246,.4)
+}
+
+ul{list-style:none;padding:0;margin:0}
+
+li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+border-bottom:2px solid #f3f4f6;
+transition:all .2s ease
+}
+
+li:hover{
+background:#f9fafb;
+border-radius:12px;
+transform:translateX(5px)
+}
+
+li:last-child{border-bottom:none}
+
+span{
+font-weight:500;
+color:#1f2937
+}
+
+.del{
+border:none;
+background:none;
+color:#ef4444;
+font-size:20px;
+cursor:pointer;
+padding:5px;
+border-radius:8px;
+transition:all .2s ease
+}
+
+.del:hover{
+background:#fef2f2;
+transform:scale(1.1)
+}
+
+.grafico-container{
+height:250px;
+margin-top:15px
+}
+
+.btn-logout{
+width:100%;
+margin-top:20px;
+padding:15px;
+background:linear-gradient(135deg,#6b7280,#4b5563);
+color:white;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:all .3s ease
+}
+
+.btn-logout:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 25px rgba(107,114,128,.4)
+}
+
+footer{
+position:fixed;
+bottom:0;
+width:100%;
+background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+color:white;
+text-align:center;
+padding:15px;
+font-weight:500;
+box-shadow:0 -4px 20px rgba(0,0,0,.1);
+font-size:14px
+}
+
+body.dark footer{
+background:linear-gradient(135deg,#1e1b4b,#312e81)
+}
+
+@media (max-width:480px){
+.container{padding:15px}
+.dashboard{grid-template-columns:1fr;gap:12px}
+.loginCard{padding:30px 25px}
+}
 </style>
 </head>
+
 <body>
 
-<!-- Login -->
+<!-- BOTÃO TEMA (sempre visível) -->
+<button class="btn-tema" onclick="alternarTema()" id="btnTema">🌙</button>
+
+<!-- LOGIN -->
 <div id="login" class="loginBox">
   <div class="loginCard">
     <h2>💰 Controle Financeiro</h2>
-    <input id="email" placeholder="Seu Email">
-    <input id="senha" type="password" placeholder="Sua Senha">
-    <button id="btnLogin" onclick="login()">Entrar</button>
-    <button id="btnRegistrar" onclick="registrar()" style="background:#10b981;">Criar conta</button>
+    <input id="email" placeholder="📧 Email" autocomplete="email">
+    <input id="senha" type="password" placeholder="🔒 Senha" autocomplete="current-password">
+    <button class="btn-primary" onclick="login()">Entrar</button>
+    <button class="btn-success" onclick="registrar()">Criar Conta</button>
   </div>
 </div>
 
-<!-- App -->
+<!-- APP -->
 <div id="app" class="container hidden">
-  <div class="topbar">
-    <button class="iconBtn" onclick="tema()" title="Alternar Tema"><i class="fas fa-moon"></i>🌕/🌑</button>
-    <div class="perfil">
-      <img src="#" alt="perfil" class="fotoPerfil">
-      <div class="infoPerfil">
-        <span id="emailUser" class="email">Usuário</span>
-        <button class="iconBtn" onclick="logout()" style="width:30px;height:30px;" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>
-🚪
-        </button>
-      </div>
+  <h3 id="emailUser" style="text-align:center;color:#1f2937;margin-bottom:20px;font-size:18px"></h3>
+
+  <div class="dashboard">
+    <div class="box">
+      <h3>Saldo Atual</h3>
+      <div id="saldo" class="valor ciano">R$ 0,00</div>
+    </div>
+    <div class="box">
+      <h3>Total Receitas</h3>
+      <div id="totalReceita" class="valor verde">R$ 0,00</div>
+    </div>
+    <div class="box">
+      <h3>Total Gastos</h3>
+      <div id="totalGasto" class="valor vermelho">R$ 0,00</div>
     </div>
   </div>
 
-  <div class="dashboard">
-    <div class="box"><div>Saldo Atual</div><div id="saldo" class="saldo">R$0,00</div></div>
-    <div class="box"><div>Receitas</div><div id="totalReceita" class="verde">R$0,00</div></div>
-    <div class="box"><div>Gastos</div><div id="totalGasto" class="vermelho">R$0,00</div></div>
-  </div>
-
   <div class="card">
-    <h3>💰 Nova Receita</h3>
-    <input id="receitaValor" type="number" placeholder="Valor (ex: 1500)" step="0.01">
-    <button onclick="addReceita()"><i class="fas fa-plus"></i> Adicionar Receita</button>
+    <h3>💵 Nova Receita</h3>
+    <input id="receitaDesc" placeholder="Descrição da receita">
+    <input id="receitaValor" type="number" step="0.01" placeholder="0,00" min="0">
+    <button onclick="addReceita()">➕ Adicionar Receita</button>
   </div>
 
   <div class="card">
     <h3>💸 Novo Gasto</h3>
-    <input id="gastoValor" type="number" placeholder="Valor (ex: 50)" step="0.01">
+    <input id="gastoDesc" placeholder="Descrição do gasto">
+    <input id="gastoValor" type="number" step="0.01" placeholder="0,00" min="0">
     <select id="categoria">
       <option value="Comida">🍔 Comida</option>
       <option value="Transporte">🚗 Transporte</option>
       <option value="Casa">🏠 Casa</option>
-      <option value="Lazer">🎉 Lazer</option>
+      <option value="Lazer">🎮 Lazer</option>
       <option value="Outros">📦 Outros</option>
     </select>
-    <button onclick="addGasto()"><i class="fas fa-minus"></i> Adicionar Gasto</button>
+    <button onclick="addGasto()">➖ Adicionar Gasto</button>
   </div>
 
   <div class="card">
-    <h3>📊 Distribuição de Gastos</h3>
-    <canvas id="grafico"></canvas>
+    <h3>📊 Gráfico de Gastos</h3>
+    <div class="grafico-container">
+      <canvas id="grafico"></canvas>
+    </div>
   </div>
 
   <div class="card">
-    <h3>📜 Extrato Recente</h3>
+    <h3>📋 Extrato Completo</h3>
     <ul id="lista"></ul>
   </div>
+
+  <button class="btn-logout" onclick="logout()">🚪 Sair</button>
 </div>
 
-<!-- Footer -->
-<footer style="text-align:center;padding:10px 0;background:#3b82f6;color:white;position:fixed;bottom:0;width:100%;font-size:12px;">
-  Finanças Pessoais v1.0 – Desenvolvido por Thalis Santos
+<footer>
+  ✨ Finanças Pessoais - Gerencie seu dinheiro com inteligência ✨
 </footer>
 
 <script>
-document.addEventListener("DOMContentLoaded",()=>{
-
-// Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
-  authDomain: "deliciacity-df6cf.firebaseapp.com",
-  databaseURL: "https://deliciacity-df6cf-default-rtdb.firebaseio.com",
-  projectId: "deliciacity-df6cf",
-  storageBucket: "deliciacity-df6cf.appspot.com",
-  messagingSenderId: "1087217649656",
-  appId: "1:1087217649656:web:712786d04ec1f3be33380d"
+const firebaseConfig={
+  apiKey:"AIzaSyDta-NeJnd-9IVVjsJWE-VF1CYwm1FLK9c",
+  authDomain:"deliciacity-df6cf.firebaseapp.com",
+  databaseURL:"https://deliciacity-df6cf-default-rtdb.firebaseio.com",
+  projectId:"deliciacity-df6cf"
 };
+
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-let uid=null,dados=[],grafico=null;
-const formatarMoeda=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+const auth=firebase.auth();
+const db=firebase.database();
 
-if(localStorage.getItem("tema")==="dark") document.body.classList.add("dark");
+let uid=null;
+let dados=[];
+let grafico=null;
 
-// Tema
-window.tema=()=>{
-  document.body.classList.toggle("dark");
-  localStorage.setItem("tema",document.body.classList.contains("dark")?"dark":"light");
-  document.querySelector('.iconBtn[onclick="tema()"] i').className=document.body.classList.contains("dark")?"fas fa-sun":"fas fa-moon";
-};
+const loginBox    = document.getElementById("login");
+const appBox      = document.getElementById("app");
+const lista       = document.getElementById("lista");
+const totalReceita= document.getElementById("totalReceita");
+const totalGasto  = document.getElementById("totalGasto");
+const saldo       = document.getElementById("saldo");
+const emailUser   = document.getElementById("emailUser");
+const receitaDesc = document.getElementById("receitaDesc");
+const receitaValor= document.getElementById("receitaValor");
+const gastoDesc   = document.getElementById("gastoDesc");
+const gastoValor  = document.getElementById("gastoValor");
+const categoria   = document.getElementById("categoria");
+const btnTema     = document.getElementById("btnTema");
 
-// Auth
+/* ── TEMA ── */
+function alternarTema(){
+  const isDark = document.body.classList.toggle("dark");
+  btnTema.textContent = isDark ? "☀️" : "🌙";
+  localStorage.setItem("tema", isDark ? "dark" : "light");
+  if(grafico) graficoAtualizar();
+}
+
+// Restaura tema salvo
+(function(){
+  if(localStorage.getItem("tema")==="dark"){
+    document.body.classList.add("dark");
+    btnTema.textContent="☀️";
+  }
+})();
+
+function formatar(v){
+  return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+}
+
 auth.onAuthStateChanged(user=>{
   if(user){
     uid=user.uid;
-    document.getElementById("emailUser").innerText=user.email;
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
-    carregarDados();
+    emailUser.innerText=`Olá, ${user.email}`;
+    loginBox.style.display="none";
+    appBox.style.display="block";
+    carregar();
   }else{
-    document.getElementById("login").classList.remove("hidden");
-    document.getElementById("app").classList.add("hidden");
+    loginBox.style.display="flex";
+    appBox.style.display="none";
   }
 });
 
-// Registro
-window.registrar=()=>{
-  const email=document.getElementById("email").value;
+function login(){
+  const email=document.getElementById("email").value.trim();
   const senha=document.getElementById("senha").value;
-  if(!email||!senha)return alert("Preencha email e senha!");
-  if(senha.length<6)return alert("Senha deve ter no mínimo 6 caracteres!");
-  const btn=document.getElementById("btnRegistrar");
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Criando...';
-  btn.disabled=true;
-  auth.createUserWithEmailAndPassword(email,senha)
-  .then(()=>{alert("Conta criada!");document.getElementById("email").value="";document.getElementById("senha").value="";})
-  .catch(e=>alert("Erro: "+e.message))
-  .finally(()=>{btn.innerHTML='Criar conta';btn.disabled=false;});
-};
-
-// Login
-window.login=()=>{
-  const email=document.getElementById("email").value;
-  const senha=document.getElementById("senha").value;
-  if(!email||!senha)return alert("Preencha email e senha!");
-  const btn=document.getElementById("btnLogin");
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Entrando...';
-  btn.disabled=true;
+  if(!email || !senha) return alert("Preencha email e senha!");
   auth.signInWithEmailAndPassword(email,senha)
-  .catch(e=>{alert("Erro: "+e.message);btn.innerHTML='Entrar';btn.disabled=false;});
-};
+    .catch(e=>alert("Erro no login: "+e.message));
+}
 
-// Logout
-window.logout=()=>{auth.signOut();location.reload();};
+function registrar(){
+  const email=document.getElementById("email").value.trim();
+  const senha=document.getElementById("senha").value;
+  if(!email || !senha || senha.length<6) return alert("Senha deve ter pelo menos 6 caracteres!");
+  auth.createUserWithEmailAndPassword(email,senha)
+    .catch(e=>alert("Erro no registro: "+e.message));
+}
 
-// Dados
-function carregarDados(){
+function logout(){
+  auth.signOut();
+}
+
+function carregar(){
+  if(!uid) return;
   db.ref("dados/"+uid).on("value",snap=>{
-    dados=[]; const lista=document.getElementById("lista"); lista.innerHTML="";
-    let totalReceita=0,totalGasto=0;
+    dados=[];
+    lista.innerHTML="";
+    let receita=0;
+    let gasto=0;
+
     snap.forEach(i=>{
-      const d=i.val(),key=i.key; dados.push({...d,key});
+      let d=i.val();
+      let key=i.key;
+      dados.push({...d,key});
+
       let li=document.createElement("li");
-      li.innerHTML=`<span>${d.data} ${d.tipo==="gasto"?'-':'+'} ${formatarMoeda(d.valor)}</span>
-      <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i>Delete</button>`;
+      const emoji = d.tipo==="receita" ? "💰" : "💸";
+      li.innerHTML=`
+        <span>${emoji} ${d.descricao} | ${formatar(d.valor)}</span>
+        <button class="del" onclick="deletar('${key}')">🗑</button>
+      `;
       lista.appendChild(li);
-      if(d.tipo==="receita")totalReceita+=d.valor;else totalGasto+=d.valor;
+
+      if(d.tipo==="receita") receita+=parseFloat(d.valor);
+      else gasto+=parseFloat(d.valor);
     });
-    document.getElementById("totalReceita").innerText=formatarMoeda(totalReceita);
-    document.getElementById("totalGasto").innerText=formatarMoeda(totalGasto);
-    document.getElementById("saldo").innerText=formatarMoeda(totalReceita-totalGasto);
-    atualizarGrafico();
+
+    totalReceita.innerText=formatar(receita);
+    totalGasto.innerText=formatar(gasto);
+    saldo.innerText=formatar(receita-gasto);
+
+    graficoAtualizar();
   });
 }
 
-window.addReceita=()=>{
-  if(!uid)return;
-  let valor=Number(document.getElementById("receitaValor").value);
-  if(!valor)return alert("Digite um valor!");
-  db.ref("dados/"+uid).push({tipo:"receita",valor:Number(valor.toFixed(2)),data:new Date().toLocaleDateString()});
-  document.getElementById("receitaValor").value="";
-};
-
-window.addGasto=()=>{
-  if(!uid)return;
-  let valor=Number(document.getElementById("gastoValor").value);
-  let cat=document.getElementById("categoria").value;
-  if(!valor)return alert("Digite um valor!");
-  db.ref("dados/"+uid).push({tipo:"gasto",valor:Number(valor.toFixed(2)),categoria:cat,data:new Date().toLocaleDateString()});
-  document.getElementById("gastoValor").value="";
-};
-
-window.deletar=(key)=>{if(!uid)return;db.ref("dados/"+uid+"/"+key).remove();};
-
-function atualizarGrafico(){
-  const ctx=document.getElementById("grafico"); let categorias={};
-  dados.forEach(d=>{if(d.tipo==="gasto")categorias[d.categoria]=(categorias[d.categoria]||0)+d.valor;});
-  if(grafico)grafico.destroy();
-  grafico=new Chart(ctx,{type:'pie',data:{labels:Object.keys(categorias),datasets:[{data:Object.values(categorias),backgroundColor:['#3b82f6','#ef4444','#10b981','#f59e0b','#8b5cf6']}]},options:{responsive:true,plugins:{legend:{position:'bottom'}}}});
+function addReceita(){
+  const valor=Number(receitaValor.value);
+  const desc=receitaDesc.value.trim() || "Receita";
+  if(!valor || valor<=0) return alert("Digite um valor válido!");
+  db.ref("dados/"+uid).push({
+    tipo:"receita",
+    valor:valor,
+    descricao:desc,
+    data:new Date().toISOString()
+  });
+  receitaValor.value="";
+  receitaDesc.value="";
 }
 
-});
+function addGasto(){
+  const valor=Number(gastoValor.value);
+  const desc=gastoDesc.value.trim() || "Gasto";
+  const cat=categoria.value;
+  if(!valor || valor<=0) return alert("Digite um valor válido!");
+  db.ref("dados/"+uid).push({
+    tipo:"gasto",
+    valor:valor,
+    descricao:desc,
+    categoria:cat,
+    data:new Date().toISOString()
+  });
+  gastoValor.value="";
+  gastoDesc.value="";
+}
+
+function deletar(key){
+  if(confirm("Deseja realmente excluir este item?")){
+    db.ref("dados/"+uid+"/"+key).remove();
+  }
+}
+
+function graficoAtualizar(){
+  const cat={};
+  dados.forEach(d=>{
+    if(d.tipo==="gasto"){
+      cat[d.categoria]=(cat[d.categoria]||0)+parseFloat(d.valor);
+    }
+  });
+
+  const ctx=document.getElementById("grafico");
+  if(grafico) grafico.destroy();
+
+  const isDark=document.body.classList.contains("dark");
+  const colors=['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316'];
+
+  grafico=new Chart(ctx,{
+    type:"doughnut",
+    data:{
+      labels:Object.keys(cat),
+      datasets:[{
+        data:Object.values(cat),
+        backgroundColor:colors.slice(0,Object.keys(cat).length),
+        borderWidth:0,
+        hoverOffset:10
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          position:'bottom',
+          labels:{
+            padding:20,
+            usePointStyle:true,
+            font:{size:12},
+            color: isDark ? "#e5e7eb" : "#1f2937"
+          }
+        }
+      }
+    }
+  });
+}
 </script>
+
 </body>
 </html>
