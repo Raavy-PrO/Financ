@@ -196,7 +196,7 @@ box-shadow:0 8px 25px rgba(16,185,129,.4)
 max-width:450px;
 margin:auto;
 padding:20px;
-padding-bottom:100px
+padding-bottom:120px; /* AUMENTADO AQUI para dar mais espaço ao botão de sair */
 }
 
 .dashboard{
@@ -380,7 +380,7 @@ background:linear-gradient(135deg,#1e1b4b,#312e81)
 }
 
 @media (max-width:480px){
-.container{padding:15px}
+.container{padding:15px; padding-bottom:120px;} /* Ajuste também para telas menores */
 .dashboard{grid-template-columns:1fr;gap:12px}
 .loginCard{padding:30px 25px}
 #btnAdminPanelFixed{right:60px;} /* Ajuste para telas menores */
@@ -1233,12 +1233,6 @@ async function loadAdminData(){
       const userUid = userSnap.key;
       const userData = userSnap.val();
       allUsers[userUid] = userData.email; // Armazena email para referência
-
-      // Adiciona ao seletor de mensagens
-      const option = document.createElement("option");
-      option.value = userUid;
-      option.textContent = userData.email;
-      adminMessageTarget.appendChild(option);
     });
   }
 
@@ -1247,6 +1241,12 @@ async function loadAdminData(){
       usersCount++;
       const userFinancialData = allUsersDataSnapshot.val()[userUid];
       const userEmail = allUsers[userUid] || `UID: ${userUid}`; // Usa email se disponível, senão UID
+
+      // Adiciona ao seletor de mensagens (feito aqui para garantir que todos os usuários com dados financeiros estejam no seletor)
+      const option = document.createElement("option");
+      option.value = userUid;
+      option.textContent = userEmail; // Usa o email ou UID para o texto da opção
+      adminMessageTarget.appendChild(option);
 
       let userReceita = 0;
       let userGasto = 0;
@@ -1265,7 +1265,7 @@ async function loadAdminData(){
       li.classList.add("admin-user-card");
       li.innerHTML = `
         <span class="user-email">${userEmail}</span>
-        <span class="user-uid">UID: ${userUid}</span>
+        ${userEmail.startsWith('UID:') ? '' : `<span class="user-uid">UID: ${userUid}</span>`}
         <span class="user-uid">Receitas: ${formatar(userReceita)} | Gastos: ${formatar(userGasto)}</span>
         <div class="user-actions">
           <button class="btn-view" onclick="viewUserDetails('${userUid}')">Ver Detalhes</button>
@@ -1285,10 +1285,13 @@ async function loadAdminData(){
     const items = userList.getElementsByTagName('li');
     for (let i = 0; i < items.length; i++) {
       const emailSpan = items[i].querySelector('.user-email');
-      const uidSpan = items[i].querySelector('.user-uid:nth-of-type(2)'); // O segundo span com UID
-      if (emailSpan && uidSpan) {
-        const textValue = (emailSpan.textContent || emailSpan.innerText) + (uidSpan.textContent || uidSpan.innerText);
-        if (textValue.toLowerCase().indexOf(filter) > -1) {
+      const uidSpan = items[i].querySelector('.user-uid'); // Pode ser o UID ou o segundo span
+      if (emailSpan) {
+        const emailText = emailSpan.textContent || emailSpan.innerText;
+        const uidText = uidSpan ? (uidSpan.textContent || uidSpan.innerText) : '';
+        const textValue = (emailText + uidText).toLowerCase();
+
+        if (textValue.indexOf(filter) > -1) {
           items[i].style.display = "";
         } else {
           items[i].style.display = "none";
