@@ -78,13 +78,14 @@ li:last-child{border-bottom:none;}
 <!-- App -->
 <div id="app" class="container hidden">
   <div class="topbar">
-    <button class="iconBtn" onclick="tema()" title="Alternar Tema"><i class="fas fa-moon"></i>Tema</button>
+    <button class="iconBtn" onclick="tema()" title="Alternar Tema"><i class="fas fa-moon"></i>🌕/🌑</button>
     <div class="perfil">
-      <img src="https://i.pravatar.cc/40" alt="perfil" class="fotoPerfil">
+      <img src="#" alt="perfil" class="fotoPerfil">
       <div class="infoPerfil">
         <span id="emailUser" class="email">Usuário</span>
         <button class="iconBtn" onclick="logout()" style="width:30px;height:30px;" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>Sair
+          <i class="fas fa-sign-out-alt"></i>
+🚪
         </button>
       </div>
     </div>
@@ -212,7 +213,7 @@ function carregarDados(){
       const d=i.val(),key=i.key; dados.push({...d,key});
       let li=document.createElement("li");
       li.innerHTML=`<span>${d.data} ${d.tipo==="gasto"?'-':'+'} ${formatarMoeda(d.valor)}</span>
-      <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i></button>`;
+      <button class="del" onclick="deletar('${key}')"><i class="fas fa-trash"></i>Delete</button>`;
       lista.appendChild(li);
       if(d.tipo==="receita")totalReceita+=d.valor;else totalGasto+=d.valor;
     });
