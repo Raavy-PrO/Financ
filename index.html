@@ -29,18 +29,24 @@ color:#e5e7eb
 
 body.dark .loginCard,
 body.dark .box,
-body.dark .card{
+body.dark .card,
+body.dark .admin-card{
 background:linear-gradient(135deg,#1f2937,#111827);
 border-color:rgba(255,255,255,.08);
 color:#e5e7eb
 }
 
 body.dark .box h3{color:#9ca3af}
-body.dark .card h3{color:#e5e7eb}
+body.dark .card h3,
+body.dark .admin-card h3{color:#e5e7eb}
 
 body.dark .loginCard input,
 body.dark .card input,
-body.dark .card select{
+body.dark .card select,
+body.dark .admin-search,
+body.dark .admin-message-input,
+body.dark .admin-target-select,
+body.dark .admin-email-input{ /* Adicionado para admin settings */
 background:#111827;
 border-color:#374151;
 color:#e5e7eb
@@ -48,7 +54,11 @@ color:#e5e7eb
 
 body.dark .loginCard input:focus,
 body.dark .card input:focus,
-body.dark .card select:focus{
+body.dark .card select:focus,
+body.dark .admin-search:focus,
+body.dark .admin-message-input:focus,
+body.dark .admin-target-select:focus,
+body.dark .admin-email-input:focus{ /* Adicionado para admin settings */
 border-color:#6366f1;
 box-shadow:0 0 0 3px rgba(99,102,241,.15)
 }
@@ -56,14 +66,26 @@ box-shadow:0 0 0 3px rgba(99,102,241,.15)
 body.dark li{border-bottom-color:#374151}
 body.dark li:hover{background:#1f2937}
 body.dark span{color:#e5e7eb}
-
 body.dark #emailUser{color:#e5e7eb}
 
-/* ── TEMA TOGGLE BUTTON ── */
-.btn-tema{
+/* Estilos para o Admin Panel */
+body.dark .admin-user-card,
+body.dark .notification-item{background:#1f2937;border-color:#374151}
+body.dark .admin-user-card .user-email{color:#a5b4fc}
+body.dark .admin-stat-box{background:linear-gradient(135deg,#1f2937,#111827);border-color:rgba(255,255,255,.08)}
+body.dark .admin-stat-box h4{color:#9ca3af}
+body.dark .tab-btn{background:#1f2937;color:#9ca3af;border-color:#374151}
+body.dark .tab-btn.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
+body.dark .notification-item.unread{background:#2a3a5a} /* Dark mode unread */
+body.dark .admin-sent-message-item{background:#1f2937;border-color:#374151;color:#e5e7eb;}
+body.dark .admin-sent-message-item strong{color:#a5b4fc;}
+body.dark .admin-list-item{background:#1f2937;border-color:#374151;color:#e5e7eb;}
+
+
+/* ── BOTÕES FIXOS (TEMA E ADMIN) ── */
+.btn-fixed{
 position:fixed;
 top:15px;
-right:15px;
 z-index:999;
 background:rgba(255,255,255,.2);
 border:2px solid rgba(255,255,255,.4);
@@ -81,10 +103,13 @@ box-shadow:0 4px 15px rgba(0,0,0,.2);
 transition:all .3s ease
 }
 
-.btn-tema:hover{
+.btn-fixed:hover{
 transform:scale(1.1) rotate(20deg);
 box-shadow:0 8px 25px rgba(0,0,0,.3)
 }
+
+#btnTema{right:15px;}
+#btnAdminPanelFixed{right:70px;} /* Posição ao lado do botão de tema */
 
 .hidden{display:none}
 
@@ -358,14 +383,378 @@ background:linear-gradient(135deg,#1e1b4b,#312e81)
 .container{padding:15px}
 .dashboard{grid-template-columns:1fr;gap:12px}
 .loginCard{padding:30px 25px}
+#btnAdminPanelFixed{right:60px;} /* Ajuste para telas menores */
 }
+
+/* ── ADMIN PANEL STYLES ── */
+.admin-panel{
+max-width:800px;
+margin:auto;
+padding:20px;
+padding-bottom:100px;
+}
+
+.admin-card{
+background:linear-gradient(135deg,white,#f8fafc);
+padding:25px;
+border-radius:16px;
+margin-top:20px;
+box-shadow:0 8px 25px rgba(0,0,0,.08);
+border:1px solid rgba(255,255,255,.5);
+backdrop-filter:blur(10px)
+}
+
+.admin-card h3{
+margin:0 0 20px 0;
+color:#1f2937;
+font-size:20px;
+display:flex;
+align-items:center;
+gap:10px
+}
+
+.admin-search,
+.admin-message-input,
+.admin-target-select,
+.admin-email-input{
+width:100%;
+padding:15px;
+margin-top:12px;
+border-radius:12px;
+border:2px solid #e5e7eb;
+font-size:16px;
+background:#f9fafb;
+transition:all .3s ease;
+}
+
+.admin-message-input{
+min-height:80px;
+resize:vertical;
+}
+
+.admin-search:focus,
+.admin-message-input:focus,
+.admin-target-select:focus,
+.admin-email-input:focus{
+outline:none;
+border-color:#3b82f6;
+box-shadow:0 0 0 3px rgba(59,130,246,.1)
+}
+
+.admin-user-list{
+list-style:none;
+padding:0;
+margin-top:20px;
+}
+
+.admin-user-card{
+display:flex;
+flex-direction:column;
+padding:15px;
+border-bottom:2px solid #f3f4f6;
+background:white;
+border-radius:12px;
+margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+border:1px solid rgba(255,255,255,.5);
+}
+
+.admin-user-card:last-child{border-bottom:none}
+
+.admin-user-card .user-email{
+font-weight:600;
+color:#4f46e5;
+margin-bottom:5px;
+}
+
+.admin-user-card .user-uid{
+font-size:12px;
+color:#6b7280;
+word-break:break-all;
+}
+
+.admin-user-card .user-actions{
+margin-top:10px;
+display:flex;
+gap:10px;
+}
+
+.admin-user-card .user-actions button{
+padding:8px 12px;
+border-radius:8px;
+border:none;
+cursor:pointer;
+font-size:14px;
+font-weight:500;
+transition:all .2s ease;
+}
+
+.admin-user-card .user-actions .btn-view{
+background:#3b82f6;
+color:white;
+}
+.admin-user-card .user-actions .btn-view:hover{background:#2563eb}
+
+.admin-user-card .user-actions .btn-delete{
+background:#ef4444;
+color:white;
+}
+.admin-user-card .user-actions .btn-delete:hover{background:#dc2626}
+
+.admin-stats-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.admin-stat-box{
+background:linear-gradient(135deg,white,#f8fafc);
+padding:20px;
+border-radius:16px;
+text-align:center;
+box-shadow:0 4px 15px rgba(0,0,0,.05);
+border:1px solid rgba(255,255,255,.5);
+}
+
+.admin-stat-box h4{
+margin:0 0 10px 0;
+font-size:14px;
+color:#6b7280;
+font-weight:500;
+}
+
+.admin-stat-box .stat-value{
+font-size:24px;
+font-weight:700;
+color:#1f2937;
+}
+
+.admin-nav-tabs{
+display:flex;
+gap:10px;
+margin-top:20px;
+border-bottom:2px solid #e5e7eb;
+padding-bottom:10px;
+}
+
+body.dark .admin-nav-tabs{border-bottom-color:#374151}
+
+.tab-btn{
+padding:10px 15px;
+border:1px solid #e5e7eb;
+border-bottom:none;
+border-radius:8px 8px 0 0;
+background:#f9fafb;
+color:#6b7280;
+cursor:pointer;
+font-weight:600;
+transition:all .2s ease;
+}
+
+.tab-btn:hover{background:#e5e7eb}
+.tab-btn.active{
+background:white;
+color:#3b82f6;
+border-color:#3b82f6;
+border-bottom-color:white;
+}
+
+body.dark .tab-btn.active{border-bottom-color:#1f2937}
+
+.tab-content{
+margin-top:20px;
+}
+
+.btn-back-to-app{
+width:100%;
+margin-top:10px;
+padding:15px;
+background:linear-gradient(135deg,#6b7280,#4b5563);
+color:white;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:all .3s ease;
+letter-spacing:.5px
+}
+
+.btn-back-to-app:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 25px rgba(107,114,128,.4)
+}
+
+/* ── NOTIFICAÇÕES DO USUÁRIO ── */
+.notification-badge{
+position:absolute;
+top:-5px;
+right:-5px;
+background:#ef4444;
+color:white;
+font-size:10px;
+font-weight:bold;
+border-radius:50%;
+padding:3px 6px;
+min-width:18px;
+text-align:center;
+}
+
+.notification-item{
+display:flex;
+flex-direction:column;
+padding:15px;
+border-bottom:2px solid #f3f4f6;
+background:white;
+border-radius:12px;
+margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+border:1px solid rgba(255,255,255,.5);
+position:relative;
+}
+
+.notification-item.unread{
+background:#e0f2fe; /* Light blue for unread */
+font-weight:600;
+}
+
+body.dark .notification-item.unread{
+background:#2a3a5a; /* Dark mode unread */
+}
+
+.notification-item .message-text{
+margin-bottom:5px;
+color:#1f2937;
+}
+body.dark .notification-item .message-text{color:#e5e7eb;}
+
+.notification-item .message-meta{
+font-size:12px;
+color:#6b7280;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.notification-item .dismiss-btn{
+background:none;
+border:none;
+color:#ef4444;
+font-size:18px;
+cursor:pointer;
+padding:0;
+margin-left:10px;
+transition:transform .2s ease;
+}
+.notification-item .dismiss-btn:hover{transform:scale(1.2)}
+
+.admin-sent-messages-list{
+list-style:none;
+padding:0;
+margin-top:20px;
+}
+.admin-sent-message-item{
+background:white;
+padding:15px;
+border-radius:12px;
+margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+border:1px solid rgba(255,255,255,.5);
+font-size:14px;
+color:#1f2937;
+display:flex; /* Para alinhar o botão de exclusão */
+flex-direction:column;
+position:relative;
+}
+body.dark .admin-sent-message-item{background:#1f2937;border-color:#374151;color:#e5e7eb;}
+.admin-sent-message-item strong{color:#3b82f6;}
+body.dark .admin-sent-message-item strong{color:#a5b4fc;}
+.admin-sent-message-item .message-date{font-size:12px;color:#6b7280;margin-top:5px;}
+
+.admin-message-delete-btn{
+position:absolute;
+top:10px;
+right:10px;
+background:none;
+border:none;
+color:#ef4444;
+font-size:18px;
+cursor:pointer;
+padding:5px;
+border-radius:8px;
+transition:all .2s ease;
+}
+.admin-message-delete-btn:hover{background:#fef2f2;transform:scale(1.1);}
+
+/* ── ADMIN SETTINGS STYLES ── */
+.admin-list{
+list-style:none;
+padding:0;
+margin-top:20px;
+}
+
+.admin-list-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px;
+border-bottom:2px solid #f3f4f6;
+background:white;
+border-radius:12px;
+margin-bottom:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+border:1px solid rgba(255,255,255,.5);
+}
+
+.admin-list-item:last-child{border-bottom:none}
+
+.admin-list-item .admin-email-text{
+font-weight:500;
+color:#1f2937;
+}
+body.dark .admin-list-item .admin-email-text{color:#e5e7eb;}
+
+
+.admin-list-item .btn-remove-admin{
+background:#ef4444;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+font-size:14px;
+font-weight:500;
+transition:all .2s ease;
+}
+.admin-list-item .btn-remove-admin:hover{background:#dc2626;transform:translateY(-1px);}
+
+.admin-add-section{
+margin-top:20px;
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.admin-add-section input{
+flex-grow:1;
+margin-top:0; /* Override default input margin */
+}
+
+.admin-add-section button{
+width:auto;
+margin-top:0; /* Override default button margin */
+padding:12px 20px;
+}
+
 </style>
 </head>
 
 <body>
 
-<!-- BOTÃO TEMA (sempre visível) -->
-<button class="btn-tema" onclick="alternarTema()" id="btnTema">🌙</button>
+<!-- BOTÕES FIXOS (TEMA E ADMIN) -->
+<button class="btn-fixed" onclick="alternarTema()" id="btnTema">🌙</button>
+<button class="btn-fixed hidden" id="btnAdminPanelFixed" onclick="showAdminPanel()">⚙️</button>
 
 <!-- LOGIN -->
 <div id="login" class="loginBox">
@@ -395,6 +784,13 @@ background:linear-gradient(135deg,#1e1b4b,#312e81)
       <h3>Total Gastos</h3>
       <div id="totalGasto" class="valor vermelho">R$ 0,00</div>
     </div>
+  </div>
+
+  <div class="card">
+    <h3>🔔 Notificações <span id="unreadNotificationsBadge" class="notification-badge hidden">0</span></h3>
+    <ul id="notificationsList">
+      <!-- Notificações serão carregadas aqui -->
+    </ul>
   </div>
 
   <div class="card">
@@ -433,6 +829,83 @@ background:linear-gradient(135deg,#1e1b4b,#312e81)
   <button class="btn-logout" onclick="logout()">🚪 Sair</button>
 </div>
 
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="admin-panel hidden">
+  <h3 id="adminUserEmail" style="text-align:center;color:#1f2937;margin-bottom:20px;font-size:18px"></h3>
+
+  <div class="admin-nav-tabs">
+    <button class="tab-btn active" onclick="openAdminTab('users')">Usuários</button>
+    <button class="tab-btn" onclick="openAdminTab('stats')">Estatísticas</button>
+    <button class="tab-btn" onclick="openAdminTab('messages')">Mensagens</button>
+    <button class="tab-btn" onclick="openAdminTab('settings')">Configurações</button>
+  </div>
+
+  <div id="usersTab" class="tab-content">
+    <div class="admin-card">
+      <h3>👥 Gerenciar Usuários</h3>
+      <input type="text" id="userSearch" class="admin-search" placeholder="Buscar por email ou UID...">
+      <ul id="userList" class="admin-user-list">
+        <!-- Usuários serão carregados aqui -->
+      </ul>
+    </div>
+  </div>
+
+  <div id="statsTab" class="tab-content hidden">
+    <div class="admin-card">
+      <h3>📈 Estatísticas Globais</h3>
+      <div class="admin-stats-grid">
+        <div class="admin-stat-box">
+          <h4>Total de Usuários</h4>
+          <div id="totalUsers" class="stat-value">0</div>
+        </div>
+        <div class="admin-stat-box">
+          <h4>Total de Receitas</h4>
+          <div id="globalTotalReceita" class="stat-value verde">R$ 0,00</div>
+        </div>
+        <div class="admin-stat-box">
+          <h4>Total de Gastos</h4>
+          <div id="globalTotalGasto" class="stat-value vermelho">R$ 0,00</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="messagesTab" class="tab-content hidden">
+    <div class="admin-card">
+      <h3>✉️ Enviar Mensagem</h3>
+      <textarea id="adminMessageText" class="admin-message-input" placeholder="Digite sua mensagem aqui..."></textarea>
+      <select id="adminMessageTarget" class="admin-target-select">
+        <option value="all">Todos os Usuários</option>
+        <!-- Opções de usuários específicos podem ser adicionadas dinamicamente aqui -->
+      </select>
+      <button class="btn-primary" onclick="sendNotification()">Enviar Mensagem</button>
+    </div>
+    <div class="admin-card" style="margin-top:20px;">
+      <h3>📜 Mensagens Enviadas</h3>
+      <ul id="adminSentMessagesList" class="admin-sent-messages-list">
+        <!-- Mensagens enviadas serão listadas aqui -->
+      </ul>
+    </div>
+  </div>
+
+  <div id="settingsTab" class="tab-content hidden">
+    <div class="admin-card">
+      <h3>⚙️ Gerenciar Administradores</h3>
+      <div class="admin-add-section">
+        <input type="email" id="newAdminEmail" class="admin-email-input" placeholder="Email do novo administrador">
+        <button class="btn-primary" onclick="addAdmin()">Adicionar Admin</button>
+      </div>
+      <ul id="adminList" class="admin-list">
+        <!-- Admins serão carregados aqui -->
+      </ul>
+    </div>
+  </div>
+
+  <button class="btn-logout" onclick="logout()">🚪 Sair do Admin</button>
+  <button class="btn-back-to-app" onclick="hideAdminPanel()">Voltar para Minhas Finanças</button>
+</div>
+
+
 <footer>
   ✨ Finanças Pessoais - Gerencie seu dinheiro com inteligência ✨
 </footer>
@@ -449,9 +922,15 @@ firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.database();
 
+// --- CONFIGURAÇÃO DO ADMIN ---
+const INITIAL_ADMIN_EMAIL = "thalissantosfreitas1102@gmail.com"; // Email do administrador inicial
+let isAdmin = false;
+// -----------------------------
+
 let uid=null;
 let dados=[];
 let grafico=null;
+let allUsers = {}; // Para armazenar UIDs e emails dos usuários para o admin panel
 
 const loginBox    = document.getElementById("login");
 const appBox      = document.getElementById("app");
@@ -466,13 +945,42 @@ const gastoDesc   = document.getElementById("gastoDesc");
 const gastoValor  = document.getElementById("gastoValor");
 const categoria   = document.getElementById("categoria");
 const btnTema     = document.getElementById("btnTema");
+const btnAdminPanelFixed = document.getElementById("btnAdminPanelFixed"); // Botão fixo para o admin panel
+
+// Admin Panel Elements
+const adminPanel = document.getElementById("adminPanel");
+const adminUserEmail = document.getElementById("adminUserEmail");
+const userList = document.getElementById("userList");
+const userSearch = document.getElementById("userSearch");
+const totalUsers = document.getElementById("totalUsers");
+const globalTotalReceita = document.getElementById("globalTotalReceita");
+const globalTotalGasto = document.getElementById("globalTotalGasto");
+const adminMessageText = document.getElementById("adminMessageText");
+const adminMessageTarget = document.getElementById("adminMessageTarget");
+const adminSentMessagesList = document.getElementById("adminSentMessagesList");
+const newAdminEmail = document.getElementById("newAdminEmail"); // Input para adicionar admin
+const adminList = document.getElementById("adminList"); // Lista de admins
+
+// User Notifications Elements
+const notificationsList = document.getElementById("notificationsList");
+const unreadNotificationsBadge = document.getElementById("unreadNotificationsBadge");
+let unreadCount = 0;
+
+// Caches para armazenar as mensagens de cada tipo
+let globalMessagesCache = {};
+let userMessagesCache = {};
+
 
 /* ── TEMA ── */
 function alternarTema(){
   const isDark = document.body.classList.toggle("dark");
   btnTema.textContent = isDark ? "☀️" : "🌙";
   localStorage.setItem("tema", isDark ? "dark" : "light");
-  if(grafico) graficoAtualizar();
+  if(grafico) graficoAtualizar(); // Atualiza o gráfico para o novo tema
+  // Re-renderiza o gráfico de admin se estiver visível (se houver)
+  if (!adminPanel.classList.contains('hidden')) {
+    // Aqui você pode adicionar lógica para atualizar gráficos específicos do admin se existirem
+  }
 }
 
 // Restaura tema salvo
@@ -487,16 +995,61 @@ function formatar(v){
   return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
 }
 
-auth.onAuthStateChanged(user=>{
+// Função para codificar email para uso como chave no Firebase (substitui '.' por ',')
+function encodeEmail(email) {
+  return email.replace(/\./g, ',');
+}
+
+// Função para decodificar email (substitui ',' por '.')
+function decodeEmail(encodedEmail) {
+  return encodedEmail.replace(/,/g, '.');
+}
+
+auth.onAuthStateChanged(async user=>{
   if(user){
     uid=user.uid;
     emailUser.innerText=`Olá, ${user.email}`;
+    adminUserEmail.innerText=`Admin: ${user.email}`; // Para o painel admin
     loginBox.style.display="none";
-    appBox.style.display="block";
-    carregar();
+
+    // Verifica se o email inicial do admin está na lista de admins no Firebase
+    const encodedInitialAdminEmail = encodeEmail(INITIAL_ADMIN_EMAIL);
+    const initialAdminRef = db.ref("admins/emails/"+encodedInitialAdminEmail);
+    const initialAdminSnap = await initialAdminRef.once("value");
+
+    if (!initialAdminSnap.exists()) {
+      // Se o admin inicial não estiver na lista, adiciona-o
+      await initialAdminRef.set(true);
+    }
+
+    // Verifica se o usuário logado é um admin
+    const encodedUserEmail = encodeEmail(user.email);
+    const adminCheckRef = db.ref("admins/emails/"+encodedUserEmail);
+    const adminCheckSnap = await adminCheckRef.once("value");
+    isAdmin = adminCheckSnap.exists();
+
+    if (isAdmin) {
+      btnAdminPanelFixed.classList.remove("hidden");
+      appBox.classList.add("hidden"); // Esconde o app normal
+      adminPanel.classList.remove("hidden"); // Mostra o painel admin por padrão se for admin
+      loadAdminData();
+      loadAdminSentMessages();
+      loadAdmins(); // Carrega a lista de admins para a aba de configurações
+    } else {
+      btnAdminPanelFixed.classList.add("hidden");
+      appBox.style.display="block"; // Mostra o app normal para usuários comuns
+      adminPanel.classList.add("hidden"); // Esconde o painel admin
+      carregar();
+      loadNotifications(); // Carrega notificações para usuários comuns
+    }
+
   }else{
     loginBox.style.display="flex";
     appBox.style.display="none";
+    adminPanel.classList.add("hidden"); // Esconde o painel admin ao deslogar
+    btnAdminPanelFixed.classList.add("hidden"); // Esconde o botão do admin
+    uid = null; // Limpa o UID
+    isAdmin = false; // Reseta o status de admin
   }
 });
 
@@ -513,6 +1066,14 @@ function registrar(){
   const senha=document.getElementById("senha").value;
   if(!email || !senha || senha.length<6) return alert("Senha deve ter pelo menos 6 caracteres!");
   auth.createUserWithEmailAndPassword(email,senha)
+    .then(userCredential => {
+      // Salva o email do usuário no Realtime Database para o admin poder ver
+      db.ref("users/"+userCredential.user.uid).set({
+        email: userCredential.user.email,
+        createdAt: new Date().toISOString()
+      });
+      alert("Conta criada com sucesso!");
+    })
     .catch(e=>alert("Erro no registro: "+e.message));
 }
 
@@ -631,6 +1192,410 @@ function graficoAtualizar(){
     }
   });
 }
+
+/* ── ADMIN PANEL FUNCTIONS ── */
+function showAdminPanel(){
+  if (!isAdmin) {
+    alert("Você não tem permissão para acessar o painel de administração.");
+    return;
+  }
+  appBox.classList.add("hidden");
+  adminPanel.classList.remove("hidden");
+  loadAdminData();
+  loadAdminSentMessages();
+  loadAdmins(); // Garante que a lista de admins seja carregada ao abrir o painel
+  openAdminTab('users'); // Abre a aba de usuários por padrão
+}
+
+function hideAdminPanel(){
+  adminPanel.classList.add("hidden");
+  appBox.classList.remove("hidden");
+  carregar(); // Recarrega os dados do usuário normal
+  loadNotifications(); // Recarrega as notificações do usuário
+}
+
+async function loadAdminData(){
+  userList.innerHTML = "<li>Carregando usuários...</li>";
+  adminMessageTarget.innerHTML = '<option value="all">Todos os Usuários</option>'; // Reset target select
+
+  let usersSnapshot = await db.ref("users").once("value"); // Pega emails dos usuários
+  let allUsersDataSnapshot = await db.ref("dados").once("value"); // Pega dados financeiros
+
+  allUsers = {}; // Limpa a lista de usuários
+  let usersCount = 0;
+  let globalReceita = 0;
+  let globalGasto = 0;
+
+  userList.innerHTML = ""; // Limpa a lista antes de preencher
+
+  if (usersSnapshot.val()) {
+    usersSnapshot.forEach(userSnap => {
+      const userUid = userSnap.key;
+      const userData = userSnap.val();
+      allUsers[userUid] = userData.email; // Armazena email para referência
+
+      // Adiciona ao seletor de mensagens
+      const option = document.createElement("option");
+      option.value = userUid;
+      option.textContent = userData.email;
+      adminMessageTarget.appendChild(option);
+    });
+  }
+
+  if (allUsersDataSnapshot.val()) {
+    for (const userUid in allUsersDataSnapshot.val()) {
+      usersCount++;
+      const userFinancialData = allUsersDataSnapshot.val()[userUid];
+      const userEmail = allUsers[userUid] || `UID: ${userUid}`; // Usa email se disponível, senão UID
+
+      let userReceita = 0;
+      let userGasto = 0;
+      for (const key in userFinancialData) {
+        const item = userFinancialData[key];
+        if (item.tipo === "receita") {
+          userReceita += parseFloat(item.valor);
+        } else if (item.tipo === "gasto") {
+          userGasto += parseFloat(item.valor);
+        }
+      }
+      globalReceita += userReceita;
+      globalGasto += userGasto;
+
+      let li = document.createElement("li");
+      li.classList.add("admin-user-card");
+      li.innerHTML = `
+        <span class="user-email">${userEmail}</span>
+        <span class="user-uid">UID: ${userUid}</span>
+        <span class="user-uid">Receitas: ${formatar(userReceita)} | Gastos: ${formatar(userGasto)}</span>
+        <div class="user-actions">
+          <button class="btn-view" onclick="viewUserDetails('${userUid}')">Ver Detalhes</button>
+          <button class="btn-delete" onclick="deleteUser('${userUid}')">Excluir Usuário</button>
+        </div>
+      `;
+      userList.appendChild(li);
+    }
+  }
+
+  totalUsers.innerText = usersCount;
+  globalTotalReceita.innerText = formatar(globalReceita);
+  globalTotalGasto.innerText = formatar(globalGasto);
+
+  userSearch.onkeyup = function() {
+    const filter = userSearch.value.toLowerCase();
+    const items = userList.getElementsByTagName('li');
+    for (let i = 0; i < items.length; i++) {
+      const emailSpan = items[i].querySelector('.user-email');
+      const uidSpan = items[i].querySelector('.user-uid:nth-of-type(2)'); // O segundo span com UID
+      if (emailSpan && uidSpan) {
+        const textValue = (emailSpan.textContent || emailSpan.innerText) + (uidSpan.textContent || uidSpan.innerText);
+        if (textValue.toLowerCase().indexOf(filter) > -1) {
+          items[i].style.display = "";
+        } else {
+          items[i].style.display = "none";
+        }
+      }
+    }
+  };
+}
+
+function viewUserDetails(targetUid){
+  alert(`Funcionalidade para ver detalhes do usuário ${allUsers[targetUid] || targetUid} seria implementada aqui. Você pode carregar os dados dele.`);
+  // Exemplo: db.ref("dados/"+targetUid).once("value").then(snap => console.log(snap.val()));
+}
+
+async function deleteUser(targetUid){
+  if(confirm(`Tem certeza que deseja excluir TODOS os dados do usuário ${allUsers[targetUid] || targetUid}? Esta ação é irreversível!`)){
+    try {
+      // Excluir dados financeiros
+      await db.ref("dados/"+targetUid).remove();
+      // Excluir informações do usuário (email)
+      await db.ref("users/"+targetUid).remove();
+      // Excluir mensagens direcionadas a este usuário
+      await db.ref("messages/user_messages/"+targetUid).remove();
+
+      alert(`Usuário ${allUsers[targetUid] || targetUid} e seus dados foram excluídos.`);
+      loadAdminData(); // Recarrega a lista de usuários
+    } catch (error) {
+      alert("Erro ao excluir usuário: " + error.message);
+    }
+  }
+}
+
+function openAdminTab(tabName) {
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabContents.forEach(tab => tab.classList.add('hidden'));
+
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach(btn => btn.classList.remove('active'));
+
+  document.getElementById(tabName + 'Tab').classList.remove('hidden');
+  document.querySelector(`.tab-btn[onclick="openAdminTab('${tabName}')"]`).classList.add('active');
+
+  if (tabName === 'stats') {
+    loadAdminData(); // Recarrega para atualizar as estatísticas globais
+  } else if (tabName === 'messages') {
+    loadAdminSentMessages(); // Carrega as mensagens enviadas
+  } else if (tabName === 'settings') {
+    loadAdmins(); // Carrega a lista de admins
+  }
+}
+
+/* ── NOTIFICATION FUNCTIONS (ADMIN SIDE) ── */
+async function sendNotification(){
+  const messageText = adminMessageText.value.trim();
+  const targetUid = adminMessageTarget.value;
+
+  if (!messageText) {
+    alert("Por favor, digite uma mensagem.");
+    return;
+  }
+
+  const notification = {
+    text: messageText,
+    timestamp: new Date().toISOString(),
+    sender: auth.currentUser.email,
+    read: false
+  };
+
+  try {
+    if (targetUid === "all") {
+      await db.ref("messages/global_messages").push(notification);
+      alert("Mensagem global enviada com sucesso!");
+    } else {
+      await db.ref("messages/user_messages/"+targetUid).push(notification);
+      alert(`Mensagem enviada para ${allUsers[targetUid] || targetUid} com sucesso!`);
+    }
+    adminMessageText.value = "";
+    loadAdminSentMessages(); // Atualiza a lista de mensagens enviadas
+  } catch (error) {
+    alert("Erro ao enviar mensagem: " + error.message);
+  }
+}
+
+function loadAdminSentMessages() {
+  adminSentMessagesList.innerHTML = "<li>Carregando mensagens enviadas...</li>";
+  db.ref("messages").once("value", snap => {
+    adminSentMessagesList.innerHTML = "";
+    const messages = snap.val() || {};
+
+    const allSentMessages = [];
+
+    // Global messages
+    if (messages.global_messages) {
+      for (const key in messages.global_messages) {
+        const msg = messages.global_messages[key];
+        allSentMessages.push({ ...msg, key, type: "global", dbPath: `messages/global_messages/${key}` });
+      }
+    }
+
+    // User-specific messages
+    if (messages.user_messages) {
+      for (const userUid in messages.user_messages) {
+        for (const key in messages.user_messages[userUid]) {
+          const msg = messages.user_messages[userUid][key];
+          allSentMessages.push({ ...msg, key, type: "user", target: allUsers[userUid] || `UID: ${userUid}`, dbPath: `messages/user_messages/${userUid}/${key}` });
+        }
+      }
+    }
+
+    allSentMessages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Mais recentes primeiro
+
+    if (allSentMessages.length === 0) {
+      adminSentMessagesList.innerHTML = "<li>Nenhuma mensagem enviada ainda.</li>";
+      return;
+    }
+
+    allSentMessages.forEach(msg => {
+      const li = document.createElement("li");
+      li.classList.add("admin-sent-message-item");
+      const date = new Date(msg.timestamp).toLocaleString('pt-BR');
+      li.innerHTML = `
+        <strong>Para: ${msg.target || "Todos os Usuários"}</strong><br>
+        ${msg.text}<br>
+        <span class="message-date">Enviado por ${msg.sender} em ${date}</span>
+        <button class="admin-message-delete-btn" onclick="deleteSentMessage('${msg.dbPath}')">✖</button>
+      `;
+      adminSentMessagesList.appendChild(li);
+    });
+  });
+}
+
+async function deleteSentMessage(dbPath) {
+  if (confirm("Tem certeza que deseja excluir esta mensagem?")) {
+    try {
+      await db.ref(dbPath).remove();
+      alert("Mensagem excluída com sucesso!");
+      loadAdminSentMessages(); // Recarrega a lista
+    } catch (error) {
+      alert("Erro ao excluir mensagem: " + error.message);
+    }
+  }
+}
+
+
+/* ── NOTIFICATION FUNCTIONS (USER SIDE) ── */
+function loadNotifications(){
+  if (!uid) return;
+
+  notificationsList.innerHTML = "<li>Carregando notificações...</li>"; // Mensagem de carregamento inicial
+  unreadCount = 0;
+
+  const globalRef = db.ref("messages/global_messages");
+  const userRef = db.ref("messages/user_messages/"+uid);
+
+  // Listener para mensagens globais
+  globalRef.on("value", globalSnap => {
+    globalMessagesCache = globalSnap.val() || {};
+    renderNotifications(); // Renderiza todas as notificações após atualizar o cache global
+  });
+
+  // Listener para mensagens específicas do usuário
+  userRef.on("value", userSnap => {
+    userMessagesCache = userSnap.val() || {};
+    renderNotifications(); // Renderiza todas as notificações após atualizar o cache do usuário
+  });
+}
+
+function renderNotifications() {
+  let allNotifications = [];
+
+  // Adiciona mensagens globais
+  for (const key in globalMessagesCache) {
+    const msg = globalMessagesCache[key];
+    allNotifications.push({ ...msg, key, type: 'global' });
+  }
+
+  // Adiciona mensagens específicas do usuário
+  for (const key in userMessagesCache) {
+    const msg = userMessagesCache[key];
+    allNotifications.push({ ...msg, key, type: 'user' });
+  }
+
+  // Ordena por data (mais recente primeiro)
+  allNotifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  notificationsList.innerHTML = ""; // Limpa a lista UMA VEZ antes de renderizar tudo
+  unreadCount = 0;
+
+  if (allNotifications.length === 0) {
+    notificationsList.innerHTML = "<li>Nenhuma notificação.</li>";
+    unreadNotificationsBadge.classList.add("hidden");
+    return;
+  }
+
+  allNotifications.forEach(msg => {
+    let li = document.createElement("li");
+    li.classList.add("notification-item");
+    if (!msg.read) {
+      li.classList.add("unread");
+      unreadCount++;
+    }
+
+    const date = new Date(msg.timestamp).toLocaleString('pt-BR');
+    li.innerHTML = `
+      <span class="message-text">${msg.text}</span>
+      <div class="message-meta">
+        <span>De: ${msg.sender} em ${date}</span>
+        <button class="dismiss-btn" onclick="dismissNotification('${msg.key}', '${msg.type}')">✖</button>
+      </div>
+    `;
+    notificationsList.appendChild(li);
+  });
+
+  updateUnreadBadge();
+}
+
+
+function dismissNotification(messageKey, messageType){
+  let ref;
+  if (messageType === 'global') {
+    ref = db.ref("messages/global_messages/"+messageKey);
+  } else { // 'user'
+    ref = db.ref("messages/user_messages/"+uid+"/"+messageKey);
+  }
+
+  ref.update({ read: true })
+    .then(() => {
+      // O listener do Firebase vai disparar e chamar renderNotifications() novamente, atualizando a UI
+    })
+    .catch(error => {
+      alert("Erro ao marcar notificação como lida: " + error.message);
+    });
+}
+
+function updateUnreadBadge(){
+  if (unreadCount > 0) {
+    unreadNotificationsBadge.textContent = unreadCount;
+    unreadNotificationsBadge.classList.remove("hidden");
+  } else {
+    unreadNotificationsBadge.classList.add("hidden");
+  }
+}
+
+/* ── ADMIN SETTINGS FUNCTIONS ── */
+async function loadAdmins() {
+  adminList.innerHTML = "<li>Carregando administradores...</li>";
+  const adminsSnapshot = await db.ref("admins/emails").once("value");
+  const admins = adminsSnapshot.val() || {};
+
+  adminList.innerHTML = "";
+  const currentAdmins = [];
+
+  for (const encodedEmail in admins) {
+    currentAdmins.push(decodeEmail(encodedEmail));
+  }
+
+  if (currentAdmins.length === 0) {
+    adminList.innerHTML = "<li>Nenhum administrador configurado.</li>";
+    return;
+  }
+
+  currentAdmins.forEach(email => {
+    const li = document.createElement("li");
+    li.classList.add("admin-list-item");
+    li.innerHTML = `
+      <span class="admin-email-text">${email}</span>
+      <button class="btn-remove-admin" onclick="removeAdmin('${encodeEmail(email)}')">Remover</button>
+    `;
+    adminList.appendChild(li);
+  });
+}
+
+async function addAdmin() {
+  const email = newAdminEmail.value.trim();
+  if (!email || !email.includes('@')) {
+    alert("Por favor, insira um email válido.");
+    return;
+  }
+
+  const encodedEmail = encodeEmail(email);
+  try {
+    await db.ref("admins/emails/"+encodedEmail).set(true);
+    alert(`O email ${email} foi adicionado como administrador.`);
+    newAdminEmail.value = "";
+    loadAdmins(); // Recarrega a lista de admins
+  } catch (error) {
+    alert("Erro ao adicionar administrador: " + error.message);
+  }
+}
+
+async function removeAdmin(encodedEmail) {
+  const email = decodeEmail(encodedEmail);
+  if (email === INITIAL_ADMIN_EMAIL) {
+    alert("O email do administrador inicial não pode ser removido.");
+    return;
+  }
+  if (confirm(`Tem certeza que deseja remover ${email} como administrador?`)) {
+    try {
+      await db.ref("admins/emails/"+encodedEmail).remove();
+      alert(`O email ${email} foi removido como administrador.`);
+      loadAdmins(); // Recarrega a lista de admins
+    } catch (error) {
+      alert("Erro ao remover administrador: " + error.message);
+    }
+  }
+}
+
 </script>
 
 </body>
